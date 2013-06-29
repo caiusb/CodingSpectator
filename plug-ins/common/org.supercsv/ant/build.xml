@@ -2,17 +2,18 @@
 <project name="fetch-lib-jars" default="install-jars" basedir=".">
 	<property file="build.properties" />
 	<property name="zip-destination-dir" value="downloads" />
+	<property name="unzipped-jars-dir" value="${zip-destination-dir}/super-csv" />
 	<property name="lib-destination-dir" value="lib" />
-	<property name="required-jars" value="SuperCSV-with_src-1.52.jar" />
+	<property name="required-jars" value="super-csv-2.1.0.jar, super-csv-2.1.0-sources.jar" />
 
 	<condition property="jar-files.present">
 		<and>
-			<available file="${lib-destination-dir}/SuperCSV-with_src-1.52.jar" />
+			<available file="${lib-destination-dir}/super-csv-2.1.0.jar" />
 		</and>
 	</condition>
 
 	<condition property="zip-file.present">
-		<available file="${zip-destination-dir}/${zip.filename}" />
+		<available file="${unzipped-jars-dir}/${zip.filename}" />
 	</condition>
 
 	<target name="fetch" unless="zip-file.present">
@@ -41,7 +42,7 @@
 
 	<target name="install-jars" description="Fetches and installs the necessary jar for this project" depends="unzip" unless="jar-files.present">
 		<move todir="${lib-destination-dir}">
-			<filelist dir="${zip-destination-dir}" files="${required-jars}" />
+			<filelist dir="${unzipped-jars-dir}" files="${required-jars}" />
 		</move>
 		<antcall target="refresh" />
 		<antcall target="rebuild" />
@@ -50,7 +51,7 @@
 	<target name="refresh">
 		<eclipse.refreshLocal resource="${project}" depth="infinite" />
 	</target>
-
+	
 	<target name="rebuild">
 		<!-- Refreshed the entire project directory to perform a build. This doesn't always seem to work and we might still need to invoke a build manually -->
 		<eclipse.incrementalBuild kind="full" />
