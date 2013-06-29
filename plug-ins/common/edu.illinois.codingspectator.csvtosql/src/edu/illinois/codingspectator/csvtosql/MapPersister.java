@@ -64,7 +64,7 @@ public class MapPersister {
 
 	public void loadCSVToSQL(String filePath) throws IOException, SQLException {
 		CsvMapReader reader= new CsvMapReader(new FileReader(filePath), CsvPreference.EXCEL_PREFERENCE);
-		String[] csvHeader= reader.getCSVHeader(true);
+		String[] csvHeader= reader.getHeader(true);
 
 		//List<String> toRemove= Arrays.asList("code-snippet", "selection-text");
 
