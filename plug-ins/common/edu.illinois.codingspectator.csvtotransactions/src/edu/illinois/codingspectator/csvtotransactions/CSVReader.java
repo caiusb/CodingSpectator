@@ -36,7 +36,7 @@ public class CSVReader implements Iterable<Map<String, String>> {
 	}
 
 	private void readHeader() throws IOException {
-		csvHeader= csvMapReader.getCSVHeader(true);
+		csvHeader= csvMapReader.getHeader(true);
 		if (requiredCSVColumns != null) {
 			if (!isCSVHeaderValid()) {
 				throw new RuntimeException("Expected CSV header:\n" + Arrays.toString(requiredCSVColumns) + "got:\n" + Arrays.toString(csvHeader));
