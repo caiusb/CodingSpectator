@@ -5,7 +5,8 @@ Bundle-SymbolicName: org.supercsv
 Bundle-Version: 1.0.0
 Bundle-Vendor: University of Illinois
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: ant/lib/SuperCSV-with_src-1.52.jar
+Bundle-ClassPath: ant/lib/super-csv-2.1.0.jar,
+ ant/lib/super-csv-2.1.0-sources.jar
 Export-Package: org.supercsv.cellprocessor.ift,
  org.supercsv.io,
  org.supercsv.prefs,
