@@ -13,7 +13,7 @@ import java.util.Set;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
-import org.supercsv.util.CSVContext;
+import org.supercsv.util.CsvContext;
 
 /**
  * @author Mohsen Vakilian
@@ -45,7 +45,7 @@ public class CodingSpectatorCSVWriter {
 		CellProcessor cellProcessor= new CellProcessor() {
 
 			@Override
-			public Object execute(Object value, CSVContext context) {
+			public Object execute(Object value, CsvContext context) {
 				if (value == null) {
 					return "";
 				} else {
