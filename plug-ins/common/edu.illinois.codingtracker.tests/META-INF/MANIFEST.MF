@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.jdt.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: University of Illinois
+Export-Package: edu.illinois.codingtracker.tests.postprocessors.ast
