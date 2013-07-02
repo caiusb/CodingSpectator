@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.jdt.core" version="2">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.jdt.core" version="2">
     <resource path="META-INF/MANIFEST.MF">
         <filter comment="Merge Java7 support into R3_7_maintenance" id="924844039">
             <message_arguments>
@@ -309,7 +310,29 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="model/org/eclipse/jdt/core/IJavaModelMarker.java" type="org.eclipse.jdt.core.IJavaModelMarker">
+        <filter comment="so it can work" id="405864542">
+            <message_arguments>
+                <message_argument value="org.eclipse.jdt.core.IJavaModelMarker"/>
+                <message_argument value="OUTPUT_OVERLAPPING_SOURCE"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="model/org/eclipse/jdt/core/IJavaModelStatusConstants.java" type="org.eclipse.jdt.core.IJavaModelStatusConstants">
+        <filter id="405864542">
+            <message_arguments>
+                <message_argument value="org.eclipse.jdt.core.IJavaModelStatusConstants"/>
+                <message_argument value="OUTPUT_LOCATION_OVERLAPPING_ANOTHER_SOURCE"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="model/org/eclipse/jdt/core/JavaCore.java" type="org.eclipse.jdt.core.JavaCore">
+        <filter id="338755678">
+            <message_arguments>
+                <message_argument value="org.eclipse.jdt.core.JavaCore"/>
+                <message_argument value="CORE_OUTPUT_LOCATION_OVERLAPPING_ANOTHER_SOURCE"/>
+            </message_arguments>
+        </filter>
         <filter comment="new APIs added for Java7 support post 3.7.0" id="1142947843">
             <message_arguments>
                 <message_argument value="3.7.1"/>
