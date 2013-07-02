@@ -53,9 +53,6 @@ public class OpenTypeHierarchyUtil {
 	public static TypeHierarchyViewPart open(IJavaElement[] candidates, IWorkbenchWindow window) {
 		Assert.isTrue(candidates != null && candidates.length != 0);
 
-		if (candidates == null)
-			return null;
-
 		try {
 			if (PreferenceConstants.OPEN_TYPE_HIERARCHY_IN_PERSPECTIVE.equals(PreferenceConstants.getPreferenceStore().getString(PreferenceConstants.OPEN_TYPE_HIERARCHY))) {
 				return openInPerspective(window, candidates);
