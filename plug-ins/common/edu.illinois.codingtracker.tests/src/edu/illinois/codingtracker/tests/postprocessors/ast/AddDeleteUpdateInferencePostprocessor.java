@@ -3,6 +3,7 @@
  */
 package edu.illinois.codingtracker.tests.postprocessors.ast;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -184,7 +185,7 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		String resourcePath= "/Test/src/Dummy.java";
 		ResourceOperationHelper.createCompilationUnit(oldFileContent, resourcePath);
 		IFile editedFile= (IFile)ResourceHelper.findWorkspaceMember(resourcePath);
-		ASTInferenceTextRecorder.astOperationAccumulator.clear();
+		ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
 		replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
 		return ASTInferenceTextRecorder.astOperationAccumulator;
 	}
