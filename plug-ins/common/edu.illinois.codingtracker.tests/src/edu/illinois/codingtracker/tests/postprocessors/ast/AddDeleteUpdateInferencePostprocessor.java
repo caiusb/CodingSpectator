@@ -38,6 +38,7 @@ import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
 import edu.illinois.codingtracker.recording.ASTInferenceTextRecorder;
 import edu.illinois.codingtracker.recording.ast.ASTOperationRecorder;
 import edu.illinois.codingtracker.recording.ast.helpers.SnapshotDifferenceCalculator;
+import edu.illinois.codingtracker.recording.ast.identification.ASTNodesIdentifier;
 
 
 /**
@@ -187,6 +188,7 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		IFile editedFile= (IFile)ResourceHelper.findWorkspaceMember(resourcePath);
 		ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
 		replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
+		ASTNodesIdentifier.resetIDs();
 		return ASTInferenceTextRecorder.astOperationAccumulator;
 	}
 
