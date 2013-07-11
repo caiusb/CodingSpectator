@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -32,6 +33,50 @@ import edu.illinois.codingtracker.operations.JavaProjectsUpkeeper;
  * 
  */
 public abstract class ResourceOperationHelper {
+
+	private static final class DoneProgressMonitor implements
+			IProgressMonitor {
+		
+		private boolean done = false;
+
+		@Override
+		public void worked(int work) {
+		}
+
+		@Override
+		public void subTask(String name) {
+		}
+
+		@Override
+		public void setTaskName(String name) {
+		}
+
+		@Override
+		public void setCanceled(boolean value) {
+		}
+
+		@Override
+		public boolean isCanceled() {
+			return false;
+		}
+
+		@Override
+		public void internalWorked(double work) {
+		}
+
+		@Override
+		public void done() {
+			done = true;
+		}
+
+		@Override
+		public void beginTask(String name, int totalWork) {
+		}
+
+		public boolean isDone() {
+			return done;
+		}
+	}
 
 	private static final String FILE_PATH_SEPARATOR= String.valueOf(IPath.SEPARATOR);
 
@@ -78,12 +123,14 @@ public abstract class ResourceOperationHelper {
 	public static ITextEditor saveResourceInEditor(String resourcePath) throws PartInitException {
 		ITextEditor editor= EditorHelper.getExistingEditor(resourcePath);
 		if (editor != null) {
-			editor.doSave(null);
-			//FIXME: Instead of sleeping, should listen to IProgressMonitor.done()
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				//do nothing
+			DoneProgressMonitor pm = new DoneProgressMonitor();
+			editor.doSave(pm);
+			while(!pm.isDone()) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					//do nothing
+				}
 			}
 		}
 		return editor;
