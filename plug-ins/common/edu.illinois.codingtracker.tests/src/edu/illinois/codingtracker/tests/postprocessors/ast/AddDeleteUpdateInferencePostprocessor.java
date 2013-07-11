@@ -12,6 +12,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -192,6 +193,10 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
 		replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
 		ASTNodesIdentifier.resetIDs();
+		ITextEditor editor = EditorHelper.getExistingEditor(resourcePath);
+		if (editor != null)
+			editor.close(false);
+		editedFile.delete(true, new NullProgressMonitor());
 		return ASTInferenceTextRecorder.astOperationAccumulator;
 	}
 
