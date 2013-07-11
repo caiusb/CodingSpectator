@@ -3,6 +3,7 @@
  */
 package edu.illinois.codingtracker.tests.postprocessors.ast;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -183,7 +184,9 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 	}
 
 	public static Set<ASTOperation> getDiffAsASTNodeOperations(String oldFileContent, String newFileContent) throws CoreException {
-		String resourcePath= "/Test/src/Dummy.java";
+		String resourcePath= "/Test/src/Dummy";
+		resourcePath += new Date().getTime() + "";
+		resourcePath += ".java";
 		ResourceOperationHelper.createCompilationUnit(oldFileContent, resourcePath);
 		IFile editedFile= (IFile)ResourceHelper.findWorkspaceMember(resourcePath);
 		ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
