@@ -11,6 +11,7 @@
 
 package org.eclipse.jdt.core.dom;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -386,8 +387,9 @@ class ASTRecoveryPropagator extends DefaultASTVisitor {
 			if (expression.getNodeType() == ASTNode.VARIABLE_DECLARATION_EXPRESSION) {
 				VariableDeclarationExpression variableDeclarationExpression = (VariableDeclarationExpression) expression;
 				List fragments = variableDeclarationExpression.fragments();
-				for (int i = 0, max = fragments.size(); i <max; i++) {
-					VariableDeclarationFragment fragment = (VariableDeclarationFragment) fragments.get(i);
+				Iterator iterator = fragments.iterator();
+				while(iterator.hasNext()) {
+					VariableDeclarationFragment fragment = (VariableDeclarationFragment) iterator.next();
 					SimpleName simpleName = fragment.getName();
 					if (CharOperation.equals(RecoveryScanner.FAKE_IDENTIFIER, simpleName.getIdentifier().toCharArray())) {
 						fragments.remove(fragment);
