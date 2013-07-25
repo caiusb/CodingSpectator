@@ -191,7 +191,12 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		ResourceOperationHelper.createCompilationUnit(oldFileContent, resourcePath);
 		IFile editedFile= (IFile)ResourceHelper.findWorkspaceMember(resourcePath);
 		ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
-		replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
+		try {
+			replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
+		} catch (RuntimeException e) {
+			System.out.println("Error replaying operation. Moving on...");
+			ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
+		}
 		ASTNodesIdentifier.resetIDs();
 		ITextEditor editor = EditorHelper.getExistingEditor(resourcePath);
 		if (editor != null)
