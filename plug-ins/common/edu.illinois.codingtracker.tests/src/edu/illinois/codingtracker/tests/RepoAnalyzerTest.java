@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import edu.illinois.codingtracker.helpers.ResourceHelper;
 import edu.illinois.codingtracker.operations.ast.ASTOperation;
+import edu.illinois.codingtracker.tests.postprocessors.ast.ASTNodeOperationException;
 import edu.illinois.codingtracker.tests.postprocessors.ast.AddDeleteUpdateInferencePostprocessor;
 
 
@@ -38,6 +39,8 @@ public class RepoAnalyzerTest {
 			Set<ASTOperation> operations= AddDeleteUpdateInferencePostprocessor.getDiffAsASTNodeOperations(oldFileContent, newFileContent);
 			assertEquals(1, operations.size());
 		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (ASTNodeOperationException e) {
 			e.printStackTrace();
 		}
 	}

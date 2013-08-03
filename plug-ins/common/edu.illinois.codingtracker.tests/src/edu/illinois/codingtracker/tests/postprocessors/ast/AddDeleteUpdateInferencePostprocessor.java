@@ -184,7 +184,7 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		replaySnapshotsAsEdits(refreshedFileOperation, refreshedFile, new String[] { currentContent, replacedText, newContent }, true);
 	}
 
-	public static Set<ASTOperation> getDiffAsASTNodeOperations(String oldFileContent, String newFileContent) throws CoreException {
+	public static Set<ASTOperation> getDiffAsASTNodeOperations(String oldFileContent, String newFileContent) throws CoreException, ASTNodeOperationException {
 		String resourcePath= "/Test/src/Dummy";
 		resourcePath += new Date().getTime() + "";
 		resourcePath += ".java";
@@ -194,8 +194,7 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 		try {
 			replaySnapshotsAsEdits(0, editedFile, new String[] { oldFileContent, newFileContent }, false);
 		} catch (RuntimeException e) {
-			System.out.println("Error replaying operation. Moving on...");
-			ASTInferenceTextRecorder.astOperationAccumulator = new HashSet<ASTOperation>();
+			throw new ASTNodeOperationException();
 		}
 		ASTNodesIdentifier.resetIDs();
 		ITextEditor editor = EditorHelper.getExistingEditor(resourcePath);
