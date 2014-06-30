@@ -6,8 +6,8 @@ package edu.illinois.codingtracker.operations.resources;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.compare.helpers.EditorHelper;
+import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.operations.OperationLexer;
 import edu.illinois.codingtracker.operations.OperationSymbols;
 import edu.illinois.codingtracker.operations.OperationTextChunk;
@@ -67,7 +67,7 @@ public class ExternallyModifiedResourceOperation extends ResourceOperation {
 				EditorHelper.closeAllEditorsForResource(resourcePath);
 				resource.delete(IResource.FORCE, null);
 			} else {
-				externallyModifiedResources.add(resourcePath);
+				addExternallyModifiedResource(resourcePath);
 			}
 		}
 	}

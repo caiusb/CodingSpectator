@@ -34,6 +34,14 @@ public abstract class CommittedFileOperation extends SnapshotedFileOperation {
 		this.committedRevision= committedRevision;
 	}
 
+	public String getRevision() {
+		return revision;
+	}
+
+	public String getCommittedRevision() {
+		return committedRevision;
+	}
+
 	@Override
 	protected void populateTextChunk(OperationTextChunk textChunk) {
 		super.populateTextChunk(textChunk);
@@ -56,7 +64,7 @@ public abstract class CommittedFileOperation extends SnapshotedFileOperation {
 	@Override
 	public void replay() throws CoreException {
 		IResource workspaceResource= ResourceHelper.findWorkspaceMember(resourcePath);
-		if (workspaceResource != null && !externallyModifiedResources.contains(resourcePath)) {
+		if (workspaceResource != null && !isExternallyModifiedResource(resourcePath)) {
 			//Match against the existing file.
 			if (!fileContent.equals(ResourceHelper.readFileContent((IFile)workspaceResource))) {
 				throw new RuntimeException("The snapshot file does not match the existing file: " + resourcePath);

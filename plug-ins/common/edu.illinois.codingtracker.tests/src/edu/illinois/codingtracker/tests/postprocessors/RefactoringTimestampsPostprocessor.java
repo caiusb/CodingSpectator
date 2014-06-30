@@ -5,6 +5,7 @@ package edu.illinois.codingtracker.tests.postprocessors;
 
 import java.util.List;
 
+import edu.illinois.codingtracker.helpers.ResourceHelper;
 import edu.illinois.codingtracker.operations.UserOperation;
 import edu.illinois.codingtracker.operations.refactorings.NewStartedRefactoringOperation;
 import edu.illinois.codingtracker.recording.TextRecorder;
@@ -32,11 +33,6 @@ public class RefactoringTimestampsPostprocessor extends CodingTrackerPostprocess
 	}
 
 	@Override
-	protected String getRecordFileName() {
-		return "codechanges.txt";
-	}
-
-	@Override
 	protected void postprocess(List<UserOperation> userOperations) {
 		for (int i= 0; i < userOperations.size(); i++) {
 			UserOperation userOperation= userOperations.get(i);
@@ -50,6 +46,16 @@ public class RefactoringTimestampsPostprocessor extends CodingTrackerPostprocess
 				TextRecorder.record(userOperation);
 			}
 		}
+	}
+
+	@Override
+	protected String getResultFilePostfix() {
+		return ".fixed_refactoring_timestamps";
+	}
+
+	@Override
+	protected String getResult() {
+		return ResourceHelper.readFileContent(mainRecordFile);
 	}
 
 }

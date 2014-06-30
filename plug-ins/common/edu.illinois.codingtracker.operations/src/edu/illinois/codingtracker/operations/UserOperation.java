@@ -62,12 +62,25 @@ public abstract class UserOperation {
 		return timestamp;
 	}
 
+	/**
+	 * Use cautiously!
+	 * 
+	 * @param newTimestamp
+	 */
+	public void setTime(long newTimestamp) {
+		timestamp= newTimestamp;
+	}
+
 	public Date getDate() {
 		return new Date(timestamp);
 	}
 
 	public boolean isTestReplayRecorded() {
 		return true;
+	}
+
+	public static IEditorPart getCurrentEditor() {
+		return currentEditor;
 	}
 
 	protected abstract char getOperationSymbol();

@@ -62,6 +62,7 @@ import edu.illinois.codingtracker.operations.textchanges.RedoneTextChangeOperati
 import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
 import edu.illinois.codingtracker.operations.textchanges.UndoneConflictEditorTextChangeOperation;
 import edu.illinois.codingtracker.operations.textchanges.UndoneTextChangeOperation;
+import edu.illinois.codingtracker.recording.ast.ASTOperationRecorder;
 
 /**
  * 
@@ -74,6 +75,8 @@ public class OperationRecorder {
 	private static volatile OperationRecorder recorderInstance= null;
 
 	private static final KnownFilesRecorder knownFilesRecorder= KnownFilesRecorder.getInstance();
+
+	private static final ASTOperationRecorder astRecorder= ASTOperationRecorder.getInstance();
 
 	private IFile lastEditedFile= null;
 
@@ -171,28 +174,35 @@ public class OperationRecorder {
 			ensureFileIsKnown((IFile)createdResource, false);
 		}
 		TextRecorder.record(new CreatedResourceOperation(createdResource, updateFlags, success));
+		astRecorder.recordASTOperationForCreatedResource(createdResource, success);
 	}
 
 	public void recordMovedResource(IResource movedResource, IPath destination, int updateFlags, boolean success) {
 		invalidateLastEditedFile(movedResource);
 		knownFilesRecorder.moveKnownFiles(movedResource, destination, success);
 		TextRecorder.record(new MovedResourceOperation(movedResource, destination, updateFlags, success));
+		astRecorder.recordASTOperationForMovedResource(movedResource, destination, success);
 	}
 
 	public void recordCopiedResource(IResource copiedResource, IPath destination, int updateFlags, boolean success) {
 		knownFilesRecorder.copyKnownFiles(copiedResource, destination, success);
 		TextRecorder.record(new CopiedResourceOperation(copiedResource, destination, updateFlags, success));
+		astRecorder.recordASTOperationForCopiedResource(copiedResource, destination, success);
 	}
 
 	public void recordDeletedResource(IResource deletedResource, int updateFlags, boolean success) {
 		invalidateLastEditedFile(deletedResource);
 		knownFilesRecorder.removeKnownFilesForResource(deletedResource);
 		TextRecorder.record(new DeletedResourceOperation(deletedResource, updateFlags, success));
+		astRecorder.recordASTOperationForDeletedResource(deletedResource, success);
 	}
 
 	public void recordExternallyModifiedFiles(Set<IFile> externallyModifiedJavaFiles, boolean areDeleted) {
 		for (IFile externallyModifiedJavaFile : externallyModifiedJavaFiles) {
 			TextRecorder.record(new ExternallyModifiedResourceOperation(externallyModifiedJavaFile, areDeleted));
+			if (areDeleted) {
+				astRecorder.recordASTOperationForDeletedResource(externallyModifiedJavaFile, true);
+			}
 		}
 	}
 

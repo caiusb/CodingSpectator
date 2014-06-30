@@ -30,6 +30,15 @@ public class UpdatedFileOperation extends FileOperation {
 
 	public UpdatedFileOperation(IFile updatedFile, String revision, String committedRevision) {
 		super(updatedFile);
+		initialize(revision, committedRevision);
+	}
+
+	public UpdatedFileOperation(String updatedFilePath, String revision, String committedRevision, long timestamp) {
+		super(updatedFilePath, timestamp);
+		initialize(revision, committedRevision);
+	}
+
+	private void initialize(String revision, String committedRevision) {
 		this.revision= revision;
 		this.committedRevision= committedRevision;
 	}
@@ -65,7 +74,7 @@ public class UpdatedFileOperation extends FileOperation {
 
 	@Override
 	public void replay() {
-		externallyModifiedResources.add(resourcePath);
+		addExternallyModifiedResource(resourcePath);
 	}
 
 	@Override

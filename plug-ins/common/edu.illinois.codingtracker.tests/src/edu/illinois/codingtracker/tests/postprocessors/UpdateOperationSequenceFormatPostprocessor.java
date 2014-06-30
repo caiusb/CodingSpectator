@@ -6,6 +6,7 @@ package edu.illinois.codingtracker.tests.postprocessors;
 import java.util.List;
 
 import edu.illinois.codingtracker.helpers.Configuration;
+import edu.illinois.codingtracker.helpers.ResourceHelper;
 import edu.illinois.codingtracker.operations.UserOperation;
 import edu.illinois.codingtracker.operations.refactorings.FinishedRefactoringOperation;
 import edu.illinois.codingtracker.operations.refactorings.NewStartedRefactoringOperation;
@@ -102,6 +103,16 @@ public class UpdateOperationSequenceFormatPostprocessor extends CodingTrackerPos
 			return RefactoringMode.REDO;
 		}
 		throw new RuntimeException("Can not establish refactoring mode for refactoring operation: " + refactoringOperation);
+	}
+
+	@Override
+	protected String getResultFilePostfix() {
+		return ".fixed_old_format";
+	}
+
+	@Override
+	protected String getResult() {
+		return ResourceHelper.readFileContent(mainRecordFile);
 	}
 
 }

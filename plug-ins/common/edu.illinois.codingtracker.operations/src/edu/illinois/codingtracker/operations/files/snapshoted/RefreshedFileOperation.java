@@ -28,6 +28,8 @@ import edu.illinois.codingtracker.operations.OperationTextChunk;
  */
 public class RefreshedFileOperation extends SnapshotedFileOperation {
 
+	public static boolean isReplaying= false;
+
 	private String replacedText;
 
 	private boolean isCausedByConflictEditorSave;
@@ -52,6 +54,10 @@ public class RefreshedFileOperation extends SnapshotedFileOperation {
 		return "Refreshed file";
 	}
 
+	public String getReplacedText() {
+		return replacedText;
+	}
+
 	@Override
 	protected void populateTextChunk(OperationTextChunk textChunk) {
 		super.populateTextChunk(textChunk);
@@ -68,6 +74,12 @@ public class RefreshedFileOperation extends SnapshotedFileOperation {
 
 	@Override
 	public void replay() throws CoreException {
+		isReplaying= true;
+		performReplaying();
+		isReplaying= false;
+	}
+
+	private void performReplaying() throws CoreException {
 		ITextEditor fileEditor= EditorHelper.getExistingEditor(resourcePath);
 		if (fileEditor != null) { //File editor exists
 			IDocument editedDocument= EditorHelper.getEditedDocument(fileEditor);

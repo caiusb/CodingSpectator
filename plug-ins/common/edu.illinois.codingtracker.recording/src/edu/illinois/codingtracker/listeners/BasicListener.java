@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.illinois.codingtracker.recording.Activator;
 import edu.illinois.codingtracker.recording.KnownFilesRecorder;
 import edu.illinois.codingtracker.recording.OperationRecorder;
+import edu.illinois.codingtracker.recording.ast.ASTOperationRecorder;
 
 /**
  * 
@@ -29,11 +30,14 @@ public abstract class BasicListener {
 
 	protected static final OperationRecorder operationRecorder= OperationRecorder.getInstance();
 
+	protected static final ASTOperationRecorder astRecorder= ASTOperationRecorder.getInstance();
+
 	protected static final Set<CompareEditor> openConflictEditors= Collections.synchronizedSet(new HashSet<CompareEditor>());
 
 	protected static volatile boolean isRefactoring= false;
 
-	protected static volatile boolean isUndoing= false;
+	//It is public such that online AST inferencing can detect that particular changes are caused by undoing code edits.
+	public static volatile boolean isUndoing= false;
 
 	protected static volatile boolean isRedoing= false;
 

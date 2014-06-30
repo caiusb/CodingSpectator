@@ -17,20 +17,26 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.compare.helpers.EditorHelper;
+import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.helpers.ResourceHelper;
 import edu.illinois.codingtracker.helpers.ViewerHelper;
 import edu.illinois.codingtracker.operations.JavaProjectsUpkeeper;
 import edu.illinois.codingtracker.operations.OperationDeserializer;
 import edu.illinois.codingtracker.operations.UserOperation;
+import edu.illinois.codingtracker.operations.ast.ASTFileOperation;
+import edu.illinois.codingtracker.operations.ast.ASTOperation;
+import edu.illinois.codingtracker.operations.ast.InferredUnknownTransformationOperation;
 import edu.illinois.codingtracker.operations.files.EditedFileOperation;
 import edu.illinois.codingtracker.operations.files.EditedUnsychronizedFileOperation;
 import edu.illinois.codingtracker.operations.files.SavedFileOperation;
@@ -47,6 +53,8 @@ import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
  */
 public class UserOperationReplayer {
 
+	private long lastSnapshotTimestamp= -1;
+
 	private enum ReplayPace {
 		FAST, SIMULATE, CUSTOM
 	}
@@ -57,7 +65,11 @@ public class UserOperationReplayer {
 
 	private IAction resetAction;
 
+	private IAction pauseAction;
+
 	private IAction findAction;
+
+	private IAction markPatternAction;
 
 	private final Collection<IAction> replayActions= new LinkedList<IAction>();
 
@@ -67,13 +79,20 @@ public class UserOperationReplayer {
 
 	private UserOperation currentUserOperation;
 
+	private boolean isCurrentOperationSplit;
+
 	private Collection<UserOperation> breakpoints;
 
-	private Thread userOperationExecutionThread;
+	private List<InferredUnknownTransformationOperation> patternOperations= new LinkedList<InferredUnknownTransformationOperation>();
+
+	private UserOperationExecutionThread userOperationExecutionThread;
 
 	private volatile boolean forcedExecutionStop= false;
 
+	private volatile boolean isPaused= false;
+
 	private IEditorPart currentEditor= null;
+
 
 	public UserOperationReplayer(OperationSequenceView operationSequenceView) {
 		this.operationSequenceView= operationSequenceView;
@@ -84,13 +103,18 @@ public class UserOperationReplayer {
 		toolBarManager.add(createLoadOperationSequenceAction());
 		toolBarManager.add(createResetOperationSequenceAction());
 		toolBarManager.add(new Separator());
-		toolBarManager.add(createReplayAction(newReplaySingleOperationAction(), "Step", "Replay the current user operation", false));
+		toolBarManager.add(createReplayAction(newReplaySingleOperationAction(false), "Step", "Replay the current user operation", false));
+		toolBarManager.add(createReplayAction(newReplaySingleOperationAction(true), "SplitStep", "Replay the current user operation in two steps", false));
 		toolBarManager.add(createReplayAction(newReplayOperationSequenceAction(ReplayPace.CUSTOM), "Custom", "Replay the remaining user operations at a custom pace", true));
 		toolBarManager.add(createReplayAction(newReplayOperationSequenceAction(ReplayPace.SIMULATE), "Simulate", "Simulate the remaining user operations at the user pace", true));
 		toolBarManager.add(createReplayAction(newReplayOperationSequenceAction(ReplayPace.FAST), "Fast", "Fast replay of the remaining user operations", true));
 		toolBarManager.add(createReplayAction(newJumpToAction(), "Jump", "Jump as close as possible to a given timestamp", false));
 		toolBarManager.add(new Separator());
+		toolBarManager.add(createPauseAction());
+		toolBarManager.add(new Separator());
 		toolBarManager.add(createFindOperationAction());
+		toolBarManager.add(new Separator());
+		toolBarManager.add(createMarkPatternAction());
 		toolBarManager.add(new Separator());
 	}
 
@@ -140,6 +164,41 @@ public class UserOperationReplayer {
 		return findAction;
 	}
 
+	private IAction createMarkPatternAction() {
+		markPatternAction= new Action() {
+			@Override
+			public void run() {
+				TransformationIDsDialog dialog= new TransformationIDsDialog(operationSequenceView.getShell(), "Mark pattern transformations");
+				if (dialog.open() == Window.OK) {
+					List<InferredUnknownTransformationOperation> oldPatternOperations= new LinkedList<InferredUnknownTransformationOperation>(patternOperations);
+					patternOperations.clear();
+					Set<Long> transformationIDs= dialog.getTransformationIDs();
+					for (UserOperation userOperation : userOperations) {
+						if (transformationIDs.isEmpty()) {
+							break;
+						}
+						if (userOperation instanceof InferredUnknownTransformationOperation) {
+							InferredUnknownTransformationOperation transformation= (InferredUnknownTransformationOperation)userOperation;
+							boolean isPatternTransformation= transformationIDs.remove(transformation.getTransformationID());
+							if (isPatternTransformation) {
+								patternOperations.add(transformation);
+							}
+						}
+					}
+					if (!transformationIDs.isEmpty()) {
+						showMessage("Could not find some pattern transformations: " + transformationIDs.toString());
+						patternOperations= oldPatternOperations;
+					} else {
+						oldPatternOperations.addAll(patternOperations);
+						operationSequenceView.updateTableViewerElements(oldPatternOperations);
+					}
+				}
+			}
+		};
+		ViewerHelper.initAction(markPatternAction, "MarkPattern", "Mark operations of a pattern", false, false, false);
+		return markPatternAction;
+	}
+
 	private IAction createLoadOperationSequenceAction() {
 		loadAction= new Action() {
 			@Override
@@ -157,6 +216,7 @@ public class UserOperationReplayer {
 					if (userOperations.size() > 0) {
 						resetAction.setEnabled(true);
 						findAction.setEnabled(true);
+						markPatternAction.setEnabled(true);
 					}
 					breakpoints= new HashSet<UserOperation>();
 					prepareForReplay();
@@ -181,6 +241,28 @@ public class UserOperationReplayer {
 		return resetAction;
 	}
 
+	private IAction createPauseAction() {
+		final String commandID= "edu.illinois.codingtracker.replaying.pause";
+		pauseAction= new Action() {
+			@Override
+			public void run() {
+				if (this.isChecked()) {
+					isPaused= true;
+					userOperationExecutionThread.interrupt();
+				} else {
+					isPaused= false;
+					//Create a copy thread since the original, stopped thread can not be restarted.
+					userOperationExecutionThread= userOperationExecutionThread.createCopy();
+					userOperationExecutionThread.start();
+				}
+			}
+		};
+		ViewerHelper.initAction(pauseAction, "Pause", "Pause/Resume the current replaying, Alt+P", false, true, false);
+		IHandlerService handlerService= (IHandlerService)PlatformUI.getWorkbench().getService(IHandlerService.class);
+		handlerService.activateHandler(commandID, new ActionHandler(pauseAction));
+		return pauseAction;
+	}
+
 	private void prepareForReplay() {
 		initializeReplay();
 		advanceCurrentUserOperation(null);
@@ -192,6 +274,9 @@ public class UserOperationReplayer {
 		UserOperation.isReplayedRefactoring= false;
 		currentEditor= null;
 		userOperationsIterator= userOperations.iterator();
+		lastSnapshotTimestamp= -1;
+		isCurrentOperationSplit= false;
+		patternOperations.clear();
 	}
 
 	private IAction createReplayAction(IAction action, String actionText, String actionToolTipText, boolean isToggable) {
@@ -200,12 +285,12 @@ public class UserOperationReplayer {
 		return action;
 	}
 
-	private IAction newReplaySingleOperationAction() {
+	private IAction newReplaySingleOperationAction(final boolean isSplitReplay) {
 		return new Action() {
 			@Override
 			public void run() {
 				try {
-					replayAndAdvanceCurrentUserOperation(null);
+					replayAndAdvanceCurrentUserOperation(null, isSplitReplay);
 				} catch (RuntimeException e) {
 					showReplayExceptionMessage();
 					throw e;
@@ -378,14 +463,15 @@ public class UserOperationReplayer {
 		forcedExecutionStop= false;
 		loadAction.setEnabled(false);
 		resetAction.setEnabled(false);
+		pauseAction.setEnabled(true);
 		findAction.setEnabled(false);
+		markPatternAction.setEnabled(false);
 		toggleReplayActions(false);
-		executionAction.setEnabled(true);
 		userOperationExecutionThread= new UserOperationExecutionThread(executionAction, replayPace, CustomDelayDialog.getDelay());
 		userOperationExecutionThread.start();
 	}
 
-	private void replayAndAdvanceCurrentUserOperation(ReplayPace replayPace) {
+	private void replayAndAdvanceCurrentUserOperation(ReplayPace replayPace, boolean isSplitReplay) {
 		try {
 			if (!Configuration.isInTestMode && currentEditor != null && currentEditor != EditorHelper.getActiveEditor()) {
 				if (userOperationExecutionThread != null && userOperationExecutionThread.isAlive()) {
@@ -395,24 +481,42 @@ public class UserOperationReplayer {
 				showMessage("The current editor is wrong. Should be: \"" + currentEditor.getTitle() + "\"");
 				return;
 			}
-			currentUserOperation.replay();
+			if (isSplitReplay && currentUserOperation instanceof TextChangeOperation && !isCurrentOperationSplit) {
+				isCurrentOperationSplit= true;
+				((TextChangeOperation)currentUserOperation).splitReplay();
+			} else {
+				isCurrentOperationSplit= false;
+				currentUserOperation.replay();
+			}
 			currentEditor= EditorHelper.getActiveEditor();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		advanceCurrentUserOperation(replayPace);
+		if (!isCurrentOperationSplit) {
+			advanceCurrentUserOperation(replayPace);
+		}
 	}
 
 	private void advanceCurrentUserOperation(ReplayPace replayPace) {
 		UserOperation oldUserOperation= currentUserOperation;
-		if (userOperationsIterator.hasNext()) {
-			currentUserOperation= userOperationsIterator.next();
-		} else {
-			currentUserOperation= null;
-		}
+		currentUserOperation= getNextReplayableUserOperation();
 		if (replayPace != ReplayPace.FAST) { //Do not display additional info during a fast replay.
 			updateSequenceView(oldUserOperation);
 		}
+	}
+
+	private UserOperation getNextReplayableUserOperation() {
+		while (userOperationsIterator.hasNext()) {
+			UserOperation nextUserOperation= userOperationsIterator.next();
+			if (nextUserOperation instanceof SnapshotedFileOperation) {
+				lastSnapshotTimestamp= nextUserOperation.getTime();
+			}
+			if (!(nextUserOperation instanceof ASTOperation) && !(nextUserOperation instanceof ASTFileOperation) &&
+					!(nextUserOperation instanceof InferredUnknownTransformationOperation) && nextUserOperation.getTime() != lastSnapshotTimestamp - 1) {
+				return nextUserOperation;
+			}
+		}
+		return null;
 	}
 
 	private void updateSequenceView(UserOperation oldUserOperation) {
@@ -436,6 +540,18 @@ public class UserOperationReplayer {
 
 	boolean isBreakpoint(Object object) {
 		return breakpoints.contains(object);
+	}
+
+	boolean isPattern(Object object) {
+		return patternOperations.contains(object);
+	}
+
+	boolean isFirstPatternElement(Object object) {
+		return patternOperations.get(0).equals(object);
+	}
+
+	boolean isLastPatternElement(Object object) {
+		return patternOperations.get(patternOperations.size() - 1).equals(object);
 	}
 
 	boolean isCurrentUserOperation(Object object) {
@@ -479,8 +595,18 @@ public class UserOperationReplayer {
 			firstUserOperation= currentUserOperation;
 		}
 
+		/**
+		 * This method is used to continue a paused replaying.
+		 * 
+		 * @return
+		 */
+		private UserOperationExecutionThread createCopy() {
+			return new UserOperationExecutionThread(executionAction, replayPace, customDelayTime);
+		}
+
 		@Override
 		public void run() {
+			executionAction.setEnabled(true);
 			final long startReplayTime= System.currentTimeMillis();
 			try {
 				do {
@@ -497,23 +623,27 @@ public class UserOperationReplayer {
 						} else if (replayPace == ReplayPace.CUSTOM) {
 							simulateDelay(customDelayTime, startTime);
 						}
-						if (forcedExecutionStop) {
+						if (forcedExecutionStop || isPaused) {
 							break;
 						}
 					}
 				} while (true);
 			} finally {
-				operationSequenceView.getDisplay().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						long replayTime= System.currentTimeMillis() - startReplayTime;
-						if (stoppedDueToException) {
-							showReplayExceptionMessage();
+				if (isPaused) {
+					executionAction.setEnabled(false);
+				} else {
+					operationSequenceView.getDisplay().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							long replayTime= System.currentTimeMillis() - startReplayTime;
+							if (stoppedDueToException) {
+								showReplayExceptionMessage();
+							}
+							showMessage("Replay time: " + replayTime + " ms");
 						}
-						showMessage("Replay time: " + replayTime + " ms");
-					}
-				});
-				updateToolBarActions();
+					});
+					updateToolBarActions();
+				}
 			}
 		}
 
@@ -522,7 +652,7 @@ public class UserOperationReplayer {
 				@Override
 				public void run() {
 					try {
-						replayAndAdvanceCurrentUserOperation(replayPace);
+						replayAndAdvanceCurrentUserOperation(replayPace, false);
 					} catch (RuntimeException e) {
 						stoppedDueToException= true;
 						throw e;
@@ -551,7 +681,9 @@ public class UserOperationReplayer {
 			executionAction.setChecked(false);
 			loadAction.setEnabled(true);
 			resetAction.setEnabled(true);
+			pauseAction.setEnabled(false);
 			findAction.setEnabled(true);
+			markPatternAction.setEnabled(true);
 			updateReplayActionsStateForCurrentUserOperation();
 			if (replayPace == ReplayPace.FAST) { //Update the view after the fast replay is over.
 				operationSequenceView.getDisplay().syncExec(new Runnable() {

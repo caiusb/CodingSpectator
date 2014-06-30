@@ -10,7 +10,7 @@ package edu.illinois.codingtracker.operations;
  */
 public abstract class OperationSymbols {
 
-	//Used symbols: 26 + 16, remaining symbols: Q R S T U V W X Y Z
+	//Used symbols: 26 + 20, remaining symbols: T V W X Y Z
 
 	public static final char ECLIPSE_STARTED_SYMBOL= 'l';
 
@@ -97,5 +97,13 @@ public abstract class OperationSymbols {
 	public static final char PROJECT_OPTIONS_CHANGED_SYMBOL= 'E';
 
 	public static final char REFERENCING_PROJECTS_CHANGED_SYMBOL= 'F';
+
+	public static final char AST_OPERATION_SYMBOL= 'Q';
+
+	public static final char AST_FILE_OPERATION_SYMBOL= 'R';
+
+	public static final char INFERRED_REFACTORING_OPERATION_SYMBOL= 'S';
+
+	public static final char INFERRED_UNKNOWN_TRANSFORMATION_OPERATION_SYMBOL= 'U';
 
 }
