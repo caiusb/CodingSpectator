@@ -66,13 +66,16 @@ public class UnknownTransformationMinerTest {
 	public void checkScalability() {
 		long startTime= System.currentTimeMillis();
 
-		mine("abcdefghijklmnopqrs", 100); //takes around 68.5 seconds for the unoptimized implementation.
-
-		//This runs "forever" for the unoptimized implementation.
-		mine("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 100);
-
+		int noOfRuns = 10;
+		for (int i=0;i<noOfRuns; i++) {
+			mine("abcdefghijklmnopqrs", 100); //takes around 68.5 seconds for the unoptimized implementation.
+	
+			//This runs "forever" for the unoptimized implementation.
+			mine("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", 100);
+		}
+		
 		long miningTime= System.currentTimeMillis() - startTime;
-		assertTrue(miningTime < 100);
+		assertTrue((float)miningTime/noOfRuns < 100);
 	}
 
 	@Test
