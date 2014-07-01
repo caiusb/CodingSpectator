@@ -29,10 +29,13 @@ public class RemainingItemsComparator implements Comparator<Item> {
 
 	private final Map<Item, Set<Integer>> cachedCommonTransactionIDs= new HashMap<Item, Set<Integer>>();
 
+	private UnknownTransformationMiner miner;
 
-	public RemainingItemsComparator(TreeSet<Item> baseItemSet, Set<Integer> baseItemSetTransactions) {
+
+	public RemainingItemsComparator(TreeSet<Item> baseItemSet, Set<Integer> baseItemSetTransactions, UnknownTransformationMiner miner) {
 		this.baseItemSet= baseItemSet;
 		this.baseItemSetTransactions= baseItemSetTransactions;
+		this.miner = miner;
 	}
 
 	public TreeSet<Item> getBaseItemSet() {
@@ -74,9 +77,9 @@ public class RemainingItemsComparator implements Comparator<Item> {
 		baseItemSet.add(item);
 		Frequency frequency;
 		if (subsetTransactionIDs != null) {
-			frequency= UnknownTransformationMiner.getSubsetFrequency(baseItemSet, subsetTransactionIDs);
+			frequency= miner.getSubsetFrequency(baseItemSet, subsetTransactionIDs);
 		} else {
-			frequency= UnknownTransformationMiner.getFrequency(baseItemSet, getCommonTransactionIDs(item));
+			frequency= miner.getFrequency(baseItemSet, getCommonTransactionIDs(item));
 		}
 		baseItemSet.remove(item);
 		return frequency;
@@ -85,7 +88,7 @@ public class RemainingItemsComparator implements Comparator<Item> {
 	public Set<Integer> getCommonTransactionIDs(Item item) {
 		Set<Integer> commonTransactionIDs= cachedCommonTransactionIDs.get(item);
 		if (commonTransactionIDs == null) {
-			Set<Integer> itemTransactions= UnknownTransformationMiner.getInputItemTransactions(item);
+			Set<Integer> itemTransactions= miner.getInputItemTransactions(item);
 			commonTransactionIDs= baseItemSet.isEmpty() ? itemTransactions : SetMapHelper.intersectTreeSets(baseItemSetTransactions, itemTransactions);
 			cachedCommonTransactionIDs.put(item, commonTransactionIDs);
 		}

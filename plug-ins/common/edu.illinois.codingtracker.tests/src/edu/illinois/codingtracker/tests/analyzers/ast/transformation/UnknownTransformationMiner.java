@@ -37,32 +37,32 @@ public class UnknownTransformationMiner {
 		NOT_SUBSUMED, SUBSUMED_FROM_RESULTS, FULLY_SUBSUMED
 	};
 
-	private static final int RESET_FREQUENCY_CACHE_SIZE= 100000; //100K
+	private final int RESET_FREQUENCY_CACHE_SIZE= 100000; //100K
 
-	private static final Map<Integer, Transaction> transactions= new HashMap<Integer, Transaction>();
+	private final Map<Integer, Transaction> transactions= new HashMap<Integer, Transaction>();
 
 	//This is used to cache itemset frequencies to avoid recomputation as well as for ordering the result. 
-	private static final Map<TreeSet<Item>, Frequency> itemSetFrequencies= new HashMap<TreeSet<Item>, Frequency>();
+	private final Map<TreeSet<Item>, Frequency> itemSetFrequencies= new HashMap<TreeSet<Item>, Frequency>();
 
 	//It is TreeMap to be able to call tailMap on it.
-	private static final TreeMap<Item, Set<Integer>> inputItemTransactions= new TreeMap<Item, Set<Integer>>();
+	private final TreeMap<Item, Set<Integer>> inputItemTransactions= new TreeMap<Item, Set<Integer>>();
 
-	private static final Map<TreeSet<Item>, TransactionsFrequencyPair> resultItemSetTransactions= new HashMap<TreeSet<Item>, TransactionsFrequencyPair>();
+	private final Map<TreeSet<Item>, TransactionsFrequencyPair> resultItemSetTransactions= new HashMap<TreeSet<Item>, TransactionsFrequencyPair>();
 
-	private static final Map<Long, Set<TreeSet<Item>>> hashedResultItemSets= new HashMap<Long, Set<TreeSet<Item>>>();
+	private final Map<Long, Set<TreeSet<Item>>> hashedResultItemSets= new HashMap<Long, Set<TreeSet<Item>>>();
 
-	private static int blockNumber= 1;
+	private int blockNumber= 1;
 
-	private static long timestamp= 0;
+	private long timestamp= 0;
 
-	private static int resultsCount= 0;
+	private int resultsCount= 0;
 
 
-	public static Set<Integer> getInputItemTransactions(Item item) {
+	public Set<Integer> getInputItemTransactions(Item item) {
 		return inputItemTransactions.get(item);
 	}
 
-	public static int getTransactionsMemorySize() {
+	public int getTransactionsMemorySize() {
 		int memorySize= 0;
 		for (Entry<Integer, Transaction> entry : transactions.entrySet()) {
 			memorySize+= 4 + entry.getValue().getMemorySize();
@@ -70,7 +70,7 @@ public class UnknownTransformationMiner {
 		return memorySize;
 	}
 
-	public static int getItemSetFrequenciesMemorySize() {
+	public int getItemSetFrequenciesMemorySize() {
 		int memorySize= 0;
 		for (Entry<TreeSet<Item>, Frequency> entry : itemSetFrequencies.entrySet()) {
 			memorySize+= entry.getKey().size() * 8 + entry.getValue().getMemorySize();
@@ -78,7 +78,7 @@ public class UnknownTransformationMiner {
 		return memorySize;
 	}
 
-	public static int getResultItemSetTransactionsMemorySize() {
+	public int getResultItemSetTransactionsMemorySize() {
 		int memorySize= 0;
 		for (Entry<TreeSet<Item>, TransactionsFrequencyPair> entry : resultItemSetTransactions.entrySet()) {
 			memorySize+= entry.getKey().size() * 8 + entry.getValue().getMemorySize();
@@ -86,13 +86,13 @@ public class UnknownTransformationMiner {
 		return memorySize;
 	}
 
-	public static void computeMemoryFootPrint() {
+	public void computeMemoryFootPrint() {
 		System.out.println("Transactions: " + getTransactionsMemorySize());
 		System.out.println("Cached frequencies: " + getItemSetFrequenciesMemorySize());
 		System.out.println("Results: " + getResultItemSetTransactionsMemorySize());
 	}
 
-	public static void mine() {
+	public void mine() {
 		printGeneralStatistics();
 
 		long startTime= System.currentTimeMillis();
@@ -102,7 +102,7 @@ public class UnknownTransformationMiner {
 		System.out.println("Mining time: " + (System.currentTimeMillis() - startTime));
 	}
 
-	private static void printGeneralStatistics() {
+	private void printGeneralStatistics() {
 		Set<Long> allOccurrences= new HashSet<Long>();
 		int transactionItemsCount= 0;
 		for (Entry<Item, Set<Integer>> entry : inputItemTransactions.entrySet()) {
@@ -121,8 +121,8 @@ public class UnknownTransformationMiner {
 		System.out.println("Number of item occurrences: " + allOccurrences.size());
 	}
 
-	private static void solve(TreeSet<Item> itemSet, Set<Integer> transactionIDs, NavigableMap<Item, Set<Integer>> remainingItems) {
-		RemainingItemsComparator remainingItemsComparator= new RemainingItemsComparator(itemSet, transactionIDs);
+	private void solve(TreeSet<Item> itemSet, Set<Integer> transactionIDs, NavigableMap<Item, Set<Integer>> remainingItems) {
+		RemainingItemsComparator remainingItemsComparator= new RemainingItemsComparator(itemSet, transactionIDs, this);
 		TreeMap<Item, Set<Integer>> localRemainingItems= new TreeMap<Item, Set<Integer>>(remainingItemsComparator);
 		localRemainingItems.putAll(remainingItems);
 		//cutTail(itemSet, localRemainingItems);
@@ -152,7 +152,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static void cutTail(TreeSet<Item> itemSet, TreeMap<Item, Set<Integer>> localRemainingItems) {
+	private void cutTail(TreeSet<Item> itemSet, TreeMap<Item, Set<Integer>> localRemainingItems) {
 		if (itemSet.isEmpty()) { //The tail is cut at the top level, i.e., for an empty prefix.
 			final int tailSize= 104; //23 + 81
 			int counter= 0;
@@ -164,7 +164,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static void outputProgress(TreeSet<Item> itemSet, TreeMap<Item, Set<Integer>> localRemainingItems) {
+	private void outputProgress(TreeSet<Item> itemSet, TreeMap<Item, Set<Integer>> localRemainingItems) {
 		if (itemSet.isEmpty()) { //Progress is tracked at the top level, i.e., for an empty prefix.
 			System.out.print("Remaining items: " + localRemainingItems.size());
 			if (timestamp == 0) {
@@ -180,7 +180,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static TreeSet<Item> fuseWithSiblings(Item currentItem, RemainingItemsComparator remainingItemsComparator, TreeMap<Item, Set<Integer>> localRemainingItems,
+	private TreeSet<Item> fuseWithSiblings(Item currentItem, RemainingItemsComparator remainingItemsComparator, TreeMap<Item, Set<Integer>> localRemainingItems,
 														TreeMap<Item, Set<Integer>> newRemainingItems) {
 		TreeSet<Item> newItemSet= new TreeSet<Item>(remainingItemsComparator.getBaseItemSet());
 		newItemSet.add(currentItem);
@@ -206,7 +206,7 @@ public class UnknownTransformationMiner {
 	 * @param transactionIDs
 	 * @return
 	 */
-	private static SubsumptionStatus getSubsumptionStatus(TreeSet<Item> checkedItemSet, Set<Integer> transactionIDs) {
+	private SubsumptionStatus getSubsumptionStatus(TreeSet<Item> checkedItemSet, Set<Integer> transactionIDs) {
 		SubsumptionStatus subsumptionStatus= SubsumptionStatus.NOT_SUBSUMED;
 		Set<TreeSet<Item>> itemSets= hashedResultItemSets.get(getHashForTransactions(transactionIDs));
 		if (itemSets == null) {
@@ -239,7 +239,7 @@ public class UnknownTransformationMiner {
 		return subsumptionStatus;
 	}
 
-	private static void addToHashedResultItemSets(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
+	private void addToHashedResultItemSets(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
 		Long hash= getHashForTransactions(transactionIDs);
 		Set<TreeSet<Item>> itemSets= hashedResultItemSets.get(hash);
 		if (itemSets == null) {
@@ -249,7 +249,7 @@ public class UnknownTransformationMiner {
 		itemSets.add(itemSet);
 	}
 
-	private static Long getHashForTransactions(Set<Integer> transactionIDs) {
+	private Long getHashForTransactions(Set<Integer> transactionIDs) {
 		long hash= 0;
 		for (Integer transactionID : transactionIDs) {
 			hash+= transactionID;
@@ -257,7 +257,7 @@ public class UnknownTransformationMiner {
 		return hash;
 	}
 
-	public static void addItemToTransactions(TreeMap<Long, Item> items, boolean isFirstBlock, boolean isLastBlock) {
+	public void addItemToTransactions(TreeMap<Long, Item> items, boolean isFirstBlock, boolean isLastBlock) {
 		if (items.isEmpty()) {
 			throw new RuntimeException("A block should contain at least one item.");
 		}
@@ -283,7 +283,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static void addItemInstanceToTransation(int transactionID, long itemID, Item item) {
+	private void addItemInstanceToTransation(int transactionID, long itemID, Item item) {
 		Transaction transaction= transactions.get(transactionID);
 		if (transaction == null) {
 			transaction= new Transaction(transactionID);
@@ -292,7 +292,7 @@ public class UnknownTransformationMiner {
 		transaction.addItemInstance(item, itemID);
 	}
 
-	public static int getFrequency(TreeSet<Item> itemSet) {
+	public int getFrequency(TreeSet<Item> itemSet) {
 		TransactionsFrequencyPair transactionsFrequencyPair= resultItemSetTransactions.get(itemSet);
 		if (transactionsFrequencyPair == null) {
 			return 0;
@@ -300,11 +300,11 @@ public class UnknownTransformationMiner {
 		return transactionsFrequencyPair.getFrequency();
 	}
 
-	static Frequency getSubsetFrequency(TreeSet<Item> itemSet, Set<Integer> subsetTransactionIDs) {
+	Frequency getSubsetFrequency(TreeSet<Item> itemSet, Set<Integer> subsetTransactionIDs) {
 		return computeFrequency(itemSet, subsetTransactionIDs);
 	}
 
-	static Frequency getFrequency(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
+	Frequency getFrequency(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
 		if (transactionIDs.isEmpty()) {
 			return new Frequency(new LinkedList<Integer>(), new LinkedList<Integer>());
 		}
@@ -320,14 +320,14 @@ public class UnknownTransformationMiner {
 		return frequency;
 	}
 
-	private static Frequency computeFrequency(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
+	private Frequency computeFrequency(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
 		removeDuplicatedInstances(itemSet, transactionIDs);
 		Frequency frequency= addFrequencyForTransactions(itemSet, transactionIDs);
 		clearRemovedDuplicatedInstances(transactionIDs);
 		return frequency;
 	}
 
-	private static void removeDuplicatedInstances(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
+	private void removeDuplicatedInstances(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
 		Iterator<Integer> transactionIDIterator= transactionIDs.iterator();
 		Transaction precedingTransaction= transactions.get(transactionIDIterator.next());
 		while (transactionIDIterator.hasNext()) {
@@ -337,7 +337,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static Frequency addFrequencyForTransactions(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
+	private Frequency addFrequencyForTransactions(TreeSet<Item> itemSet, Set<Integer> transactionIDs) {
 		List<Integer> minimalFrequencies= new LinkedList<Integer>();
 		List<Integer> maximalFrequencies= new LinkedList<Integer>();
 		for (int transactionID : transactionIDs) {
@@ -348,13 +348,13 @@ public class UnknownTransformationMiner {
 		return new Frequency(minimalFrequencies, maximalFrequencies);
 	}
 
-	private static void clearRemovedDuplicatedInstances(Set<Integer> transactionIDs) {
+	private void clearRemovedDuplicatedInstances(Set<Integer> transactionIDs) {
 		for (int transactionID : transactionIDs) {
 			transactions.get(transactionID).clearRemovedDuplicatedItemInstances();
 		}
 	}
 
-	public static void resetState() {
+	public void resetState() {
 		transactions.clear();
 		inputItemTransactions.clear();
 		resultItemSetTransactions.clear();
@@ -365,13 +365,13 @@ public class UnknownTransformationMiner {
 		resultsCount= 0;
 	}
 
-	public static void printState() {
+	public void printState() {
 		for (Entry<TreeSet<Item>, TransactionsFrequencyPair> entry : resultItemSetTransactions.entrySet()) {
 			System.out.print(getItemSetResultAsText(entry.getKey(), entry.getValue()));
 		}
 	}
 
-	private static StringBuffer getItemSetResultAsText(TreeSet<Item> itemSet, TransactionsFrequencyPair transactionsFrequencyPair) {
+	private StringBuffer getItemSetResultAsText(TreeSet<Item> itemSet, TransactionsFrequencyPair transactionsFrequencyPair) {
 		StringBuffer result= new StringBuffer();
 		Set<Integer> transactionIDs= transactionsFrequencyPair.getTransactions();
 		result.append("Item set: ").append(itemSet).append("\n");
@@ -386,7 +386,7 @@ public class UnknownTransformationMiner {
 		return result;
 	}
 
-	public static void writeResultsToFolder(File miningResultsFolder) {
+	public void writeResultsToFolder(File miningResultsFolder) {
 		//First, ensure some additional free memory.
 		inputItemTransactions.clear();
 		hashedResultItemSets.clear();
@@ -404,7 +404,7 @@ public class UnknownTransformationMiner {
 		writeOrderedResultsToFolder(new File(miningResultsFolder, "FrequencyAndSize"), resultsList);
 	}
 
-	private static void deleteFilesRecursively(File folder) {
+	private void deleteFilesRecursively(File folder) {
 		for (File file : folder.listFiles()) {
 			if (file.isDirectory()) {
 				deleteFilesRecursively(file);
@@ -415,7 +415,7 @@ public class UnknownTransformationMiner {
 		}
 	}
 
-	private static void writeOrderedResultsToFolder(File orderedResultsFolder, List<Entry<TreeSet<Item>, TransactionsFrequencyPair>> orderedResults) {
+	private void writeOrderedResultsToFolder(File orderedResultsFolder, List<Entry<TreeSet<Item>, TransactionsFrequencyPair>> orderedResults) {
 		orderedResultsFolder.mkdir();
 		int counter= 1;
 		for (Entry<TreeSet<Item>, TransactionsFrequencyPair> entry : orderedResults) {

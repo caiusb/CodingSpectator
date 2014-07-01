@@ -24,23 +24,25 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTran
 public class UnknownTransformationMinerTest {
 
 
+	private UnknownTransformationMiner miner;
+
 	public void mine(String sequence, int maxTransformationSize) {
 		checkMiningPreconditions(sequence, maxTransformationSize);
-		UnknownTransformationMiner.resetState();
+		miner = new UnknownTransformationMiner();
 		long itemID= 1;
 		boolean isFirstBlock= true;
 		TreeMap<Long, Item> currentBlockItems= new TreeMap<Long, Item>();
 		for (char c : sequence.toCharArray()) {
 			if (currentBlockItems.size() == maxTransformationSize) {
-				UnknownTransformationMiner.addItemToTransactions(currentBlockItems, isFirstBlock, false);
+				miner.addItemToTransactions(currentBlockItems, isFirstBlock, false);
 				isFirstBlock= false;
 				currentBlockItems.clear();
 			}
 			currentBlockItems.put(itemID, new CharItem(c));
 			itemID++;
 		}
-		UnknownTransformationMiner.addItemToTransactions(currentBlockItems, isFirstBlock, true);
-		UnknownTransformationMiner.mine();
+		miner.addItemToTransactions(currentBlockItems, isFirstBlock, true);
+		miner.mine();
 	}
 
 	private void checkMiningPreconditions(String sequence, int maxTransformationSize) {
@@ -57,7 +59,7 @@ public class UnknownTransformationMinerTest {
 		for (char c : sequence.toCharArray()) {
 			itemSet.add(new CharItem(c));
 		}
-		return UnknownTransformationMiner.getFrequency(itemSet);
+		return miner.getFrequency(itemSet);
 	}
 
 	@Test

@@ -41,8 +41,15 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 
 	private final static Set<UnknownTransformationDescriptor> ignoredAtomicTransformations= new HashSet<UnknownTransformationDescriptor>();
 
+	private UnknownTransformationMiner miner;
+
 	static {
 		populateIgnoredAtomicTransformations();
+	}
+	
+	public UnknownTransformationsAnalyzer(UnknownTransformationMiner miner) {
+		this.miner = miner;
+		
 	}
 
 	private static void populateIgnoredAtomicTransformations() {
@@ -110,14 +117,14 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 					currentBlock= new ItemBlock(transformationOperation.getTime(), true);
 				}
 				if (!currentBlock.canBePartOfBlock(transformationOperation)) {
-					UnknownTransformationMiner.addItemToTransactions(currentBlock.getItems(), currentBlock.isFirst(), false);
+					miner.addItemToTransactions(currentBlock.getItems(), currentBlock.isFirst(), false);
 					currentBlock= new ItemBlock(transformationOperation.getTime(), false);
 				}
 				currentBlock.addToBlock(transformationOperation);
 			}
 		}
 		if (currentBlock != null) {
-			UnknownTransformationMiner.addItemToTransactions(currentBlock.getItems(), currentBlock.isFirst(), true);
+			miner.addItemToTransactions(currentBlock.getItems(), currentBlock.isFirst(), true);
 		}
 	}
 
@@ -132,8 +139,8 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 	protected void finishedProcessingAllSequences() {
 		writeToFile(transformationKindsFile, getTransformationKindsAsText(), false);
 		writeToFile(atomicTransformationsFile, getAtomicTransformationsAsText(), false);
-		UnknownTransformationMiner.mine();
-		UnknownTransformationMiner.writeResultsToFolder(miningResultsFolder);
+		miner.mine();
+		miner.writeResultsToFolder(miningResultsFolder);
 	}
 
 	private StringBuffer getTransformationKindsAsText() {
