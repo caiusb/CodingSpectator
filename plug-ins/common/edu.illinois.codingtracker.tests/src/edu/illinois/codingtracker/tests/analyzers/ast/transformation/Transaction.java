@@ -152,5 +152,9 @@ public class Transaction {
 			}
 		}
 	}
+	
+	public String toString() {
+		return "<" + transactionID + ": " +  itemInstances + ">";
+	}
 
 }

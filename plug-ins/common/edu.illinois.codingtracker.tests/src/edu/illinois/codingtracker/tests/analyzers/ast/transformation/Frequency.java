@@ -113,5 +113,9 @@ public class Frequency implements Comparable<Frequency> {
 		}
 		return 0;
 	}
+	
+	public String toString() {
+		return "Overall: " + overallFrequency + " from {" + minimalFrequencies + ";" + maximalFrequencies +"}";
+	}
 
 }
