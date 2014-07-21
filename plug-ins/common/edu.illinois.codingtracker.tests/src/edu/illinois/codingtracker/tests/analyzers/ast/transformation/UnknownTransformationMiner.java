@@ -51,6 +51,9 @@ public class UnknownTransformationMiner {
 
 	private final Map<Long, Set<TreeSet<Item>>> hashedResultItemSets= new HashMap<Long, Set<TreeSet<Item>>>();
 
+	/**
+	 * I represent the current block number
+	 */
 	private int blockNumber= 1;
 
 	private long timestamp= 0;
@@ -257,6 +260,20 @@ public class UnknownTransformationMiner {
 		return hash;
 	}
 
+	/**
+	 * I add a map of items and their ID's to the necessary
+	 * <code>Transaction</code>s.
+	 * 
+	 * If the map is empty, I will throw a <code>RuntimeException</code>.
+	 * 
+	 * @param items
+	 *            a <code>TreeMap</code> of items to add, containing the ID (a
+	 *            Long) and the Item.
+	 * @param isFirstBlock
+	 *            true if this is the first block
+	 * @param isLastBlock
+	 *            true if this is the last block
+	 */
 	public void addItemToTransactions(TreeMap<Long, Item> items, boolean isFirstBlock, boolean isLastBlock) {
 		if (items.isEmpty()) {
 			throw new RuntimeException("A block should contain at least one item.");
