@@ -32,7 +32,7 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 	private File transformationKindsFile= new File(Configuration.postprocessorRootFolderName, "transformationKinds.txt");
 
 	private File atomicTransformationsFile= new File(Configuration.postprocessorRootFolderName, "atomicTransformations.txt");
-
+	
 	private File miningResultsFolder= new File(Configuration.postprocessorRootFolderName, "MiningResults");
 
 	private final Map<Long, UnknownTransformationDescriptor> transformationKinds= new TreeMap<Long, UnknownTransformationDescriptor>();
