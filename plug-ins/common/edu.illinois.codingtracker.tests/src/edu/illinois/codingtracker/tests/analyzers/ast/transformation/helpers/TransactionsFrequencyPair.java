@@ -34,5 +34,9 @@ public class TransactionsFrequencyPair {
 	public int getMemorySize() {
 		return (frequency + transactions.size()) * 4;
 	}
+	
+	public String toString() {
+		return "{" + transactions + "}; frequency=" + frequency;
+	}
 
 }
