@@ -52,7 +52,8 @@ public class UnknownTransformationMiner {
 	private final Map<Long, Set<TreeSet<Item>>> hashedResultItemSets= new HashMap<Long, Set<TreeSet<Item>>>();
 
 	/**
-	 * I represent the current block number
+	 * I represent the current block number. I am basically a substitute
+	 * for the transaction ID (or a way you can get to one).
 	 */
 	private int blockNumber= 1;
 
@@ -265,6 +266,11 @@ public class UnknownTransformationMiner {
 	 * <code>Transaction</code>s.
 	 * 
 	 * If the map is empty, I will throw a <code>RuntimeException</code>.
+	 * 
+	 * If <code>isFirstBlock</code> is false, I will also add the
+	 * <code>items</code> to the previous transactions. The effect of this is
+	 * the "overlapping transactions", as described in the paper, technical
+	 * report and thesis.
 	 * 
 	 * @param items
 	 *            a <code>TreeMap</code> of items to add, containing the ID (a

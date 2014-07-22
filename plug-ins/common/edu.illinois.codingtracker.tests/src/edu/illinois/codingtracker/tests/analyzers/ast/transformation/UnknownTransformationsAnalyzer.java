@@ -99,6 +99,13 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 		return "codechanges.txt.inferred_ast_operations.with_move.with_inferred_refactorings.with_inferred_unknown_transformations";
 	}
 
+	/**
+	 * I split the existing <code>userOperations</code> into blocks that are
+	 * then grouped into transactions by <code>UnknownTransformationMiner<code>
+	 * 
+	 * @param userOperations
+	 *            the user operations to be mined
+	 */
 	@Override
 	protected void postprocess(List<UserOperation> userOperations) {
 		initialize();
