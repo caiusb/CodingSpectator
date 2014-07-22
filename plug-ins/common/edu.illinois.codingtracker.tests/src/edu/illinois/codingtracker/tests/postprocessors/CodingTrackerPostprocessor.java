@@ -79,7 +79,8 @@ public abstract class CodingTrackerPostprocessor extends CodingTrackerTest {
 			for (File childFile : file.listFiles()) {
 				visitLocation(childFile);
 			}
-		} else if (shouldPostprocessFile(file)) {
+		} else 
+			if (shouldPostprocessFile(file)) {
 			try {
 				postprocess(file);
 			} catch (Exception e) {
@@ -94,11 +95,16 @@ public abstract class CodingTrackerPostprocessor extends CodingTrackerTest {
 
 	private boolean shouldPostprocessFile(File file) {
 		String versionFolderName= file.getParentFile().getParentFile().getName();
-		return shouldPostprocessVersionFolder(versionFolderName) && isRecordFile(file);
+		boolean shouldPostprocessVersionFolder = shouldPostprocessVersionFolder(versionFolderName);
+		boolean isRecordFile = isRecordFile(file);
+		boolean shouldPostprocessFile = shouldPostprocessVersionFolder && isRecordFile;
+		return shouldPostprocessFile;
 	}
 
 	private boolean isRecordFile(File file) {
-		return file.getName().equals(getRecordFileName());
+		String fileName = file.getName();
+		String recordFileName = getRecordFileName();
+		return fileName.equals(recordFileName);
 	}
 
 	protected String getRecordFileName() {
