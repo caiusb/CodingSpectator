@@ -47,8 +47,8 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 		populateIgnoredAtomicTransformations();
 	}
 	
-	public UnknownTransformationsAnalyzer(UnknownTransformationMiner miner) {
-		this.miner = miner;
+	public UnknownTransformationsAnalyzer() {
+		this.miner = new UnknownTransformationMiner();
 		
 	}
 
