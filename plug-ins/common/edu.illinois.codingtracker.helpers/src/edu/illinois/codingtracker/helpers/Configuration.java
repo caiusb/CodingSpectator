@@ -19,19 +19,19 @@ public class Configuration {
 
 	public static final boolean isOldASTFormat= System.getenv("OLD_AST_CODINGTRACKER_FORMAT") != null;
 
-	public static final String postprocessorRootFolderName= "postprocessor_root"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
+	public static final String postprocessorRootFolderName= "/Users/caius/osu/COPE/CodingTracker/postprocessor_root"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
 
 	public static final long usageTimeStart;
 
 	public static final long usageTimeStop;
 
-	public static final boolean isInPostprocessMode= postprocessorRootFolderName != null;
+	public static final boolean isInPostprocessMode= true;
 
-	public static final boolean isInASTInferenceMode= System.getenv("AST_INFERENCE_MODE") != null;
+	public static final boolean isInASTInferenceMode= true; //System.getenv("AST_INFERENCE_MODE") != null;
 
-	public static final boolean isInRefactoringInferenceMode= System.getenv("REFACTORING_INFERENCE_MODE") != null;
+	public static final boolean isInRefactoringInferenceMode= true; //System.getenv("REFACTORING_INFERENCE_MODE") != null;
 
-	public static final boolean isInReplayMode= System.getenv("REPLAY_MODE") != null;
+	public static final boolean isInReplayMode= true; //System.getenv("REPLAY_MODE") != null;
 
 	public static final int miningFrequencyTimesSizeThreshold;
 
