@@ -50,7 +50,7 @@ public class UnknownTransformationInferencePostprocessor extends ASTPostprocesso
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize(userOperations);
 		//Create a copy for iterating to avoid concurrent modification errors that appear when the unknown transformation
 		//factory adds inferred transformations to the list.
@@ -70,6 +70,8 @@ public class UnknownTransformationInferencePostprocessor extends ASTPostprocesso
 			record(userOperation);
 		}
 		persistUnknownTransformationDescriptors();
+		
+		return userOperations;
 	}
 
 	private void persistUnknownTransformationDescriptors() {

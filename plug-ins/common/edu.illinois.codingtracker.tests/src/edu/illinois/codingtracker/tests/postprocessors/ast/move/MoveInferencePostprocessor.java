@@ -36,7 +36,7 @@ public class MoveInferencePostprocessor extends ASTPostprocessor {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		nodeOperationsMap.clear();
 		for (UserOperation userOperation : userOperations) {
 			if (shouldProcess(userOperation)) {
@@ -50,6 +50,8 @@ public class MoveInferencePostprocessor extends ASTPostprocessor {
 		for (UserOperation userOperation : userOperations) {
 			record(userOperation);
 		}
+		
+		return userOperations;
 	}
 
 	private void processASTOperation(ASTOperation astOperation) {

@@ -107,7 +107,7 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 	 *            the user operations to be mined
 	 */
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		ItemBlock currentBlock= null;
 		for (UserOperation userOperation : userOperations) {
@@ -133,6 +133,8 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 		if (currentBlock != null) {
 			miner.addItemToTransactions(currentBlock.getItems(), currentBlock.isFirst(), true);
 		}
+		
+		return userOperations;
 	}
 
 	private boolean shouldProcess(UserOperation operation) {

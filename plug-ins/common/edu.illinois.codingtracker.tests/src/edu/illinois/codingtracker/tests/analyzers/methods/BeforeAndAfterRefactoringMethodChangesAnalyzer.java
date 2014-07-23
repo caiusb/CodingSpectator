@@ -62,7 +62,7 @@ public class BeforeAndAfterRefactoringMethodChangesAnalyzer extends CSVProducing
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initializeAnalyzer(userOperations);
 		for (int i= 0; i < userOperations.size(); i++) {
 			if (userOperations.get(i) instanceof NewStartedRefactoringOperation) {
@@ -72,6 +72,8 @@ public class BeforeAndAfterRefactoringMethodChangesAnalyzer extends CSVProducing
 		System.out.println("Total: " + totalChangesCountBefore[2] + ", " + totalChangesCountBefore[1] + ", " +
 				totalChangesCountBefore[0] + ", " + totalChangesCountAfter[0] + ", " + totalChangesCountAfter[1] +
 				", " + totalChangesCountAfter[2]);
+		
+		return userOperations;
 	}
 
 	private void handleStartedRefactoringOperation(int startedRefactoringOperationIndex) {

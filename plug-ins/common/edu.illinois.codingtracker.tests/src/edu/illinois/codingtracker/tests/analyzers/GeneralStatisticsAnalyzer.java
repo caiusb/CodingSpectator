@@ -36,7 +36,7 @@ public class GeneralStatisticsAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		result= new StringBuffer();
 		int testSessionsCount= 0;
 		int testCaseRunsCount= 0;
@@ -68,6 +68,8 @@ public class GeneralStatisticsAnalyzer extends CSVProducingAnalyzer {
 		System.out.println("Test case runs count: " + testCaseRunsCount);
 		System.out.println("Commit events count: " + commitEventsCount);
 		System.out.println("File commits count: " + fileCommitsCount);
+		
+		return userOperations;
 	}
 
 	@Override

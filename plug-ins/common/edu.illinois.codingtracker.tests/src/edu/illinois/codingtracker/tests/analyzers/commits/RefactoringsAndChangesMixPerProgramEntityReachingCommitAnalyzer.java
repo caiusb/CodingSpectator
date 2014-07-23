@@ -76,7 +76,7 @@ public class RefactoringsAndChangesMixPerProgramEntityReachingCommitAnalyzer ext
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof NewStartedRefactoringOperation) {
@@ -95,6 +95,8 @@ public class RefactoringsAndChangesMixPerProgramEntityReachingCommitAnalyzer ext
 		}
 		System.out.println("Total refactored program entities count: " + totalRefactoredEntitiesCount);
 		System.out.println("Total refactored and changed program entities count: " + totalRefactoredAndChangedEntitiesCount);
+		
+		return userOperations;
 	}
 
 	private void handleStartedRefactoringOperation() {

@@ -56,7 +56,7 @@ public class RefactoringInferencePostprocessor extends ASTPostprocessor {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize(userOperations);
 		//Create a copy for iterating to avoid concurrent modification errors that appear when the refactoring factory
 		//adds inferred refactorings to the list.
@@ -78,6 +78,8 @@ public class RefactoringInferencePostprocessor extends ASTPostprocessor {
 		for (UserOperation userOperation : userOperations) {
 			record(userOperation);
 		}
+		
+		return userOperations;
 	}
 
 	private void postprocessUserOperation(UserOperation userOperation) {

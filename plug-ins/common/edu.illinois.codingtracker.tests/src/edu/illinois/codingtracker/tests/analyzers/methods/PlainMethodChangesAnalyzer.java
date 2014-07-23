@@ -51,7 +51,7 @@ public class PlainMethodChangesAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof ASTOperation) {
@@ -59,6 +59,8 @@ public class PlainMethodChangesAnalyzer extends CSVProducingAnalyzer {
 			}
 		}
 		populateResults();
+		
+		return userOperations;
 	}
 
 	private void handleASTOperation(ASTOperation astOperation) {

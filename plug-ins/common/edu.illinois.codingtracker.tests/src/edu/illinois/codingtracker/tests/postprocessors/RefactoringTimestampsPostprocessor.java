@@ -33,7 +33,7 @@ public class RefactoringTimestampsPostprocessor extends CodingTrackerPostprocess
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		for (int i= 0; i < userOperations.size(); i++) {
 			UserOperation userOperation= userOperations.get(i);
 			if (userOperation instanceof NewStartedRefactoringOperation && userOperation.getTime() == -1) {
@@ -46,6 +46,8 @@ public class RefactoringTimestampsPostprocessor extends CodingTrackerPostprocess
 				TextRecorder.record(userOperation);
 			}
 		}
+		
+		return userOperations;
 	}
 
 	@Override

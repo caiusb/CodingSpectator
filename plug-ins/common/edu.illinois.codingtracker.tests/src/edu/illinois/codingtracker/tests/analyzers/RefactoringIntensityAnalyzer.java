@@ -62,7 +62,7 @@ public class RefactoringIntensityAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof NewStartedRefactoringOperation) {
@@ -84,6 +84,8 @@ public class RefactoringIntensityAnalyzer extends CSVProducingAnalyzer {
 				throw new RuntimeException("Could not replay user operation: " + userOperation, e);
 			}
 		}
+		
+		return userOperations;
 	}
 
 	private void handleMovedResourceOperation(MovedResourceOperation movedResourceOperation) {

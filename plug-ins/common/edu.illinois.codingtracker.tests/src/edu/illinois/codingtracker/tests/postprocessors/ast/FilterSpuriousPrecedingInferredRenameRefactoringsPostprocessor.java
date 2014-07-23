@@ -56,11 +56,13 @@ public class FilterSpuriousPrecedingInferredRenameRefactoringsPostprocessor exte
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		analyze(userOperations);
 		update(userOperations);
 		record(userOperations);
+		
+		return userOperations;
 	}
 
 	private void record(List<UserOperation> userOperations) {

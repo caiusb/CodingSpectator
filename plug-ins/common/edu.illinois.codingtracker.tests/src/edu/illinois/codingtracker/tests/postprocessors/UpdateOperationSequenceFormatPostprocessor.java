@@ -52,11 +52,13 @@ public class UpdateOperationSequenceFormatPostprocessor extends CodingTrackerPos
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		updateRefactoringOperations(userOperations);
 		for (UserOperation userOperation : userOperations) {
 			TextRecorder.record(userOperation);
 		}
+		
+		return userOperations;
 	}
 
 	private void updateRefactoringOperations(List<UserOperation> userOperations) {

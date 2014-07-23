@@ -74,7 +74,7 @@ public class ChangesAfterTestBeforeCommitAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof ASTFileOperation) {
@@ -93,6 +93,8 @@ public class ChangesAfterTestBeforeCommitAnalyzer extends CSVProducingAnalyzer {
 		System.out.println("Total commit after test changes count: " + totalCommitAfterTestChangesCount);
 		System.out.println("Total commit after test commenting/uncommenting changes count: " + totalCommitAfterTestCommentingOrUncommentingChangesCount);
 		System.out.println("Total commit after test undoing changes count: " + totalCommitAfterTestUndoingChangesCount);
+		
+		return userOperations;
 	}
 
 	private void handleTestSessionStartedOperation() {

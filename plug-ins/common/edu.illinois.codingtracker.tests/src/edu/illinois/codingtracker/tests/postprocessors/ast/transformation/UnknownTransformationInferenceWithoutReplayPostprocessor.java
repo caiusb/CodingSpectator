@@ -40,7 +40,7 @@ public class UnknownTransformationInferenceWithoutReplayPostprocessor extends AS
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize(userOperations);
 		//Create a copy for iterating to avoid concurrent modification errors that appear when the unknown transformation
 		//factory adds inferred transformations to the list.
@@ -57,6 +57,8 @@ public class UnknownTransformationInferenceWithoutReplayPostprocessor extends AS
 		for (UserOperation userOperation : userOperations) {
 			record(userOperation);
 		}
+		
+		return userOperations;
 	}
 
 	private void postprocessUserOperation(UserOperation userOperation) {

@@ -66,7 +66,7 @@ public abstract class AggregatedMethodRefactoringsAnalyzer extends CSVProducingA
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof NewStartedRefactoringOperation) {
@@ -78,6 +78,8 @@ public abstract class AggregatedMethodRefactoringsAnalyzer extends CSVProducingA
 			}
 		}
 		populateResults();
+		
+		return userOperations;
 	}
 
 	private void aggregatePerRefactoringChanges() {

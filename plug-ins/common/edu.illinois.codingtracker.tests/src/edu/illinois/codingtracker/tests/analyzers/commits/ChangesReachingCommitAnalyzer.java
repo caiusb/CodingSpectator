@@ -61,7 +61,7 @@ public class ChangesReachingCommitAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof ASTFileOperation) {
@@ -78,6 +78,8 @@ public class ChangesReachingCommitAnalyzer extends CSVProducingAnalyzer {
 		System.out.println("Overall shadowed changes count: " + overallShadowedChangesCount);
 		System.out.println("Overall shadowed commenting or uncommenting changes count: " + overallShadowedCommentingOrUncommentingChangesCount);
 		System.out.println("Overall shadowed undoing changes count: " + overallShadowedUndoingChangesCount);
+		
+		return userOperations;
 	}
 
 	private void handleASTOperation(ASTOperation astOperation) {

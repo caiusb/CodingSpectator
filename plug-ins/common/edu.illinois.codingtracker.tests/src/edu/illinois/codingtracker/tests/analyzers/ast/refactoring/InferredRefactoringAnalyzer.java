@@ -56,7 +56,7 @@ public abstract class InferredRefactoringAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof NewStartedRefactoringOperation) {
@@ -68,6 +68,8 @@ public abstract class InferredRefactoringAnalyzer extends CSVProducingAnalyzer {
 			}
 		}
 		populateResults();
+		
+		return userOperations;
 	}
 
 	private void handleFinishedRefactoring(FinishedRefactoringOperation finishedRefactoringOperation) {

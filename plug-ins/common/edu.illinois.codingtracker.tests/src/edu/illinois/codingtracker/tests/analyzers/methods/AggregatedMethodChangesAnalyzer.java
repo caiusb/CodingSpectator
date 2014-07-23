@@ -57,7 +57,7 @@ public abstract class AggregatedMethodChangesAnalyzer extends CSVProducingAnalyz
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof ASTOperation) {
@@ -65,6 +65,8 @@ public abstract class AggregatedMethodChangesAnalyzer extends CSVProducingAnalyz
 			}
 		}
 		populateResults();
+		
+		return userOperations;
 	}
 
 	private void handleASTOperation(ASTOperation astOperation) {

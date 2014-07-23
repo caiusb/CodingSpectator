@@ -75,7 +75,7 @@ public class RefactoringsAndChangesMixPerMethodReachingCommitAnalyzer extends CS
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof NewStartedRefactoringOperation) {
@@ -94,6 +94,8 @@ public class RefactoringsAndChangesMixPerMethodReachingCommitAnalyzer extends CS
 		}
 		System.out.println("Total refactored methods count: " + totalRefactoredMethodsCount);
 		System.out.println("Total refactored and changed methods count: " + totalRefactoredAndChangedMethodsCount);
+		
+		return userOperations;
 	}
 
 	private void handleStartedRefactoringOperation() {

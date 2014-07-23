@@ -44,10 +44,12 @@ public class UpdateOperationSequenceASTFormatPostprocessor extends CodingTracker
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		for (UserOperation userOperation : userOperations) {
 			TextRecorder.record(userOperation);
 		}
+		
+		return userOperations;
 	}
 
 	@Override

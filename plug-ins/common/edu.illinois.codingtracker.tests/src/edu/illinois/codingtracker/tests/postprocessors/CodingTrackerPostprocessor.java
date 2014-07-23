@@ -243,7 +243,7 @@ public abstract class CodingTrackerPostprocessor extends CodingTrackerTest {
 
 	protected abstract void checkPostprocessingPreconditions();
 
-	protected abstract void postprocess(List<UserOperation> userOperations);
+	protected abstract List<UserOperation> postprocess(List<UserOperation> userOperations);
 
 	protected abstract String getResultFilePostfix();
 

@@ -50,7 +50,7 @@ public class UnknownTransformationKindsAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof InferredUnknownTransformationOperation) {
@@ -64,6 +64,8 @@ public class UnknownTransformationKindsAnalyzer extends CSVProducingAnalyzer {
 				transformationInstances.addInstance(transformationOperation.getTime());
 			}
 		}
+		
+		return userOperations;
 	}
 
 	@Override

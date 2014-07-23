@@ -42,7 +42,7 @@ public class SpuriousSVNCommitsPostprocessor extends CodingTrackerPostprocessor 
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		fixedSpuriousCommitsCount= 0;
 		boolean isCollectingCommits= false;
 		boolean isCollectingExternalChanges= false;
@@ -71,6 +71,8 @@ public class SpuriousSVNCommitsPostprocessor extends CodingTrackerPostprocessor 
 			postprocessCollectedOperations();
 		}
 		System.out.println("Fixed spurious commits count: " + fixedSpuriousCommitsCount);
+		
+		return userOperations;
 	}
 
 	private void postprocessCollectedOperations() {

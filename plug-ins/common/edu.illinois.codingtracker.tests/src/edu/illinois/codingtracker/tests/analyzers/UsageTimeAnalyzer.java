@@ -61,7 +61,7 @@ public class UsageTimeAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		if (userOperations.size() > 0) {
 			long previousTimestamp= userOperations.get(0).getTime();
@@ -78,6 +78,8 @@ public class UsageTimeAnalyzer extends CSVProducingAnalyzer {
 		totalUsageTime+= sequenceUsageTime;
 		participantUsageTime+= sequenceUsageTime;
 		appendCSVEntry(postprocessedUsername, postprocessedWorkspaceID, postprocessedVersion, sequenceUsageTime);
+		
+		return userOperations;
 	}
 
 	private void handleConsecutiveTimestamps(long previousTimestamp, long currentTimestamp) {

@@ -66,9 +66,9 @@ public class MethodChangesTimeDistributionAnalyzer extends CSVProducingAnalyzer 
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		if (userOperations.isEmpty()) {
-			return;
+			return userOperations;
 		}
 
 		long startTime= System.currentTimeMillis();
@@ -90,6 +90,8 @@ public class MethodChangesTimeDistributionAnalyzer extends CSVProducingAnalyzer 
 				totalBeforeCount[1], totalBeforeCount[0], totalAfterCount[0], totalAfterCount[1], totalAfterCount[2]);
 
 		System.out.println("\nAnalysis time: " + (System.currentTimeMillis() - startTime));
+		
+		return userOperations;
 	}
 
 	private void initializeAfterCounters() {

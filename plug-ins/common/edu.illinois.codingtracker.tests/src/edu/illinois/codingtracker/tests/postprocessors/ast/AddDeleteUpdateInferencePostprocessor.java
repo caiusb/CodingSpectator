@@ -56,7 +56,7 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		for (int i= 0; i < userOperations.size(); i++) {
 			UserOperation userOperation= userOperations.get(i);
 			if (userOperation instanceof TextChangeOperation) {
@@ -89,6 +89,8 @@ public class AddDeleteUpdateInferencePostprocessor extends ASTPostprocessor {
 			}
 		}
 		applyAccumulatedOperations(true); //Just in case
+		
+		return userOperations;
 	}
 
 	private void handleTextChangeOperation(TextChangeOperation textChangeOperation) {

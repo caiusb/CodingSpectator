@@ -54,7 +54,7 @@ public class TestFixesAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	@Override
-	protected void postprocess(List<UserOperation> userOperations) {
+	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		initialize();
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof TestCaseStartedOperation) {
@@ -68,6 +68,8 @@ public class TestFixesAnalyzer extends CSVProducingAnalyzer {
 		populateResults();
 		System.out.println("Fixed tests count: " + fixedTestsCount);
 		System.out.println("Fixed changed tests count: " + fixedChangedTestsCount);
+		
+		return userOperations;
 	}
 
 	private void handleTestCaseStartedOperation(TestCaseStartedOperation testCaseStartedOperation) {
