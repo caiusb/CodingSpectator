@@ -19,7 +19,7 @@ public class Configuration {
 
 	public static final boolean isOldASTFormat= System.getenv("OLD_AST_CODINGTRACKER_FORMAT") != null;
 
-	public static final String postprocessorRootFolderName= "/Users/caius/osu/COPE/CodingTracker/postprocessor_root"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
+	public static final String postprocessorRootFolderName= "/Users/caius/osu/TransformationRecommender/CodingTracker/postprocessor_root"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
 
 	public static final long usageTimeStart;
 
