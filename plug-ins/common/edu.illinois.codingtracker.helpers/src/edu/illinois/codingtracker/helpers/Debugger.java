@@ -53,7 +53,7 @@ public class Debugger {
 
 	public static void debugFileSize(String message, File file) {
 		if (Configuration.isInDebugMode) {
-			System.out.println(message + file.length());
+			System.out.println(message + " " + file.getName() + "/"  + file.length());
 		}
 	}
 
