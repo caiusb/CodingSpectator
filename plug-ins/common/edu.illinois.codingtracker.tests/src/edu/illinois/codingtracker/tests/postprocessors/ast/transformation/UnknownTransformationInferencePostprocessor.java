@@ -38,7 +38,6 @@ public class UnknownTransformationInferencePostprocessor extends ASTPostprocesso
 
 	private boolean isInsideAutomatedRefactoring;
 
-
 	@Override
 	protected String getRecordFileName() {
 		return "codechanges.txt.inferred_ast_operations.with_move.with_inferred_refactorings";
