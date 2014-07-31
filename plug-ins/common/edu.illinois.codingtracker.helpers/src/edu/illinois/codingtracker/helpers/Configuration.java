@@ -41,6 +41,8 @@ public class Configuration {
 
 	public static final long miningMaxOutputItemSetsCount;
 
+	public static final int minimumSizeThreshold = 20;
+
 
 	static {
 		String envUsageTimeStart= System.getenv("USAGE_TIME_START");

@@ -141,6 +141,8 @@ public class UnknownTransformationMiner {
 				if (!frequency.isEqualTo(currentItemFrequency)) {
 					throw new RuntimeException("Frequency got skewed!");
 				}
+				if (newItemSet.size() < Configuration.minimumSizeThreshold)
+					continue;
 				if (frequency.getOverallFrequency() * newItemSet.size() >= Configuration.miningFrequencyTimesSizeThreshold) {
 					outputProgress(itemSet, localRemainingItems); //Output the progress only when the item is contributing.
 					SubsumptionStatus subsumptionStatus= getSubsumptionStatus(newItemSet, commonTransactionIDs);
