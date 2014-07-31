@@ -29,7 +29,7 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.Ope
  */
 public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 
-	private File transformationKindsFile= new File(Configuration.postprocessorRootFolderName, "transformationKinds.txt");
+	private File transformationKindsFile= new File(Configuration.postprocessorRootFolderName, "transformationKinds.csv");
 
 	private File atomicTransformationsFile= new File(Configuration.postprocessorRootFolderName, "atomicTransformations.txt");
 	
@@ -158,10 +158,25 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 		for (Entry<Long, UnknownTransformationDescriptor> entry : transformationKinds.entrySet()) {
 			UnknownTransformationDescriptor descriptor= entry.getValue();
 			sb.append(entry.getKey()).append(",").append(descriptor.getOperationKind()).append(",");
-			sb.append(descriptor.getAffectedNodeType()).append(",").append(descriptor.getAbstractedNodeContent());
-			sb.append(",").append(descriptor.getAffectedNodeContent()).append("\n");
+			sb.append(descriptor.getAffectedNodeType()).append(",").append("\"");
+			appendExcapefiedString(sb, descriptor.getAbstractedNodeContent());
+			sb.append("\"");
+			sb.append(",").append("\"");
+			appendExcapefiedString(sb, descriptor.getAffectedNodeContent());
+			sb.append("\"").append("\n");
 		}
 		return sb;
+	}
+
+	private void appendExcapefiedString(StringBuffer sb,
+			String affectedNodeContent) {
+		for (int i=0; i<affectedNodeContent.length(); i++)
+			switch(affectedNodeContent.charAt(i)) {
+			case '"': 
+				sb.append("\"\"");
+				break;
+			default: sb.append(affectedNodeContent.charAt(i));
+			}
 	}
 
 	private StringBuffer getAtomicTransformationsAsText() {
