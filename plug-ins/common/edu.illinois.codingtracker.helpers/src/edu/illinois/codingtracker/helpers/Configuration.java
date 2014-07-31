@@ -35,7 +35,7 @@ public class Configuration {
 
 	public static final int miningFrequencyTimesSizeThreshold;
 
-	public static final int miningMinimumItemsetFrequency;
+	public static final int miningMinimumItemsetFrequency = 1;
 
 	public static final long miningMaxBlockSize;
 
@@ -64,12 +64,12 @@ public class Configuration {
 			miningFrequencyTimesSizeThreshold= 1;
 		}
 
-		String envMinimumFrequency= System.getenv("MINING_MINIMUM_ITEMSET_FREQUENCY");
-		if (envMinimumFrequency != null) {
-			miningMinimumItemsetFrequency= Integer.parseInt(envMinimumFrequency);
-		} else {
-			miningMinimumItemsetFrequency= 1;
-		}
+//		String envMinimumFrequency= System.getenv("MINING_MINIMUM_ITEMSET_FREQUENCY");
+//		if (envMinimumFrequency != null) {
+//			miningMinimumItemsetFrequency= Integer.parseInt(envMinimumFrequency);
+//		} else {
+//			miningMinimumItemsetFrequency= 1;
+//		}
 
 		String envMiningMaxBlockSize= System.getenv("MINING_MAX_BLOCK_SIZE"); //Is defined in minutes.
 		if (envMiningMaxBlockSize != null) {
