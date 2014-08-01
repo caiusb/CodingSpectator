@@ -3,6 +3,7 @@ package edu.oregonstate.codingtracker.tests.recommender;
 import java.util.List;
 
 import edu.illinois.codingtracker.operations.UserOperation;
+import edu.illinois.codingtracker.operations.ast.ASTOperation;
 import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
@@ -32,6 +33,13 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	 */
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
+		for (UserOperation userOperation : userOperations) {
+			if(!(userOperation instanceof ASTOperation))
+				continue;
+			
+			
+			
+		}
 		return userOperations;
 	}
 
