@@ -9,10 +9,12 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 	@Override
 	protected String getTableHeader() {
-		// TODO Auto-generated method stub
 		return "";
 	}
 
+	/**
+	 * By default, I postprocess everything.
+	 */
 	@Override
 	protected boolean shouldPostprocessVersionFolder(String folderName) {
 		return true;
@@ -20,13 +22,16 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 	@Override
 	protected void checkPostprocessingPreconditions() {
-		// TODO Auto-generated method stub
-
 	}
 
+	/**
+	 * I am a processor that tries to recommend changes based on the things
+	 * coming in. For simplicity, I only look at the AST Changes. I already know
+	 * the common transformation patterns, because they are given to me by the
+	 * UnknownTransformatioAnalyzer. 
+	 */
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
-		// TODO Auto-generated method stub
 		return userOperations;
 	}
 
