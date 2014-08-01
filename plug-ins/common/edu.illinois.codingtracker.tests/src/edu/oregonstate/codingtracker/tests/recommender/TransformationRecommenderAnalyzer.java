@@ -19,6 +19,7 @@ import edu.illinois.codingtracker.operations.ast.ASTOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.OperationKind;
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
+import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
@@ -30,7 +31,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
 	/**
-	 * I parse the TransformationKinds file and return a new, populated map.
+	 * I parse the transformationKinds.csv file and return a new, populated map.
 	 */
 	private Map<Long, UnknownTransformationDescriptor> parseTransformationKindsFile() {
 		CsvListReader csvReader = null;
@@ -62,7 +63,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	/**
-	 * I return the CSVProcessors to be used while parsing the
+	 * I return the {@link CellProcessor} to be used while parsing the
 	 * transformationKinds file.
 	 * 
 	 * @return an array with the processors
@@ -93,11 +94,11 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	 * I am a processor that tries to recommend changes based on the things
 	 * coming in. For simplicity, I only look at the AST Changes. I already know
 	 * the common transformation patterns, because they are given to me by the
-	 * UnknownTransformatioAnalyzer.
+	 * {@link UnknownTransformationsAnalyzer}.
 	 */
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
-		Map<Long, UnknownTransformationDescriptor> unknownTransformationKinds = parseTransformationKindsFile();
+		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 
 		for (UserOperation userOperation : userOperations) {
 			if (!(userOperation instanceof ASTOperation))
