@@ -29,11 +29,11 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.Ope
  */
 public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 
-	private File transformationKindsFile= new File(Configuration.postprocessorRootFolderName, "transformationKinds.csv");
+	private File transformationKindsFile= new File(Configuration.postprocessorRootFolderName, Configuration.TRANSFORMATION_KINDS_FILE);
 
-	private File atomicTransformationsFile= new File(Configuration.postprocessorRootFolderName, "atomicTransformations.txt");
+	private File atomicTransformationsFile= new File(Configuration.postprocessorRootFolderName, Configuration.ATOMIC_TRANSFORMATIONS_FILE);
 	
-	private File miningResultsFolder= new File(Configuration.postprocessorRootFolderName, "MiningResults");
+	private File miningResultsFolder= new File(Configuration.postprocessorRootFolderName, Configuration.MINING_RESULTS_FOLDER);
 
 	private final Map<Long, UnknownTransformationDescriptor> transformationKinds= new TreeMap<Long, UnknownTransformationDescriptor>();
 

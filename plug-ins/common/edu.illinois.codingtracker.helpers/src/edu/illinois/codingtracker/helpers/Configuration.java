@@ -43,6 +43,11 @@ public class Configuration {
 
 	public static final int minimumSizeThreshold = 20;
 
+	public static final String TRANSFORMATION_KINDS_FILE = "transformationKinds.csv";
+	
+	public static final String ATOMIC_TRANSFORMATIONS_FILE = "atomicTransformations.txt";
+	
+	public static final String MINING_RESULTS_FOLDER = "MiningResults";
 
 	static {
 		String envUsageTimeStart= System.getenv("USAGE_TIME_START");
@@ -87,5 +92,4 @@ public class Configuration {
 			miningMaxOutputItemSetsCount= Integer.MAX_VALUE;
 		}
 	}
-
 }
