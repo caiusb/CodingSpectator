@@ -159,16 +159,16 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 			UnknownTransformationDescriptor descriptor= entry.getValue();
 			sb.append(entry.getKey()).append(",").append(descriptor.getOperationKind()).append(",");
 			sb.append(descriptor.getAffectedNodeType()).append(",").append("\"");
-			appendExcapefiedString(sb, descriptor.getAbstractedNodeContent());
+			appendEscapefiedString(sb, descriptor.getAbstractedNodeContent());
 			sb.append("\"");
 			sb.append(",").append("\"");
-			appendExcapefiedString(sb, descriptor.getAffectedNodeContent());
+			appendEscapefiedString(sb, descriptor.getAffectedNodeContent());
 			sb.append("\"").append("\n");
 		}
 		return sb;
 	}
 
-	private void appendExcapefiedString(StringBuffer sb,
+	private void appendEscapefiedString(StringBuffer sb,
 			String affectedNodeContent) {
 		for (int i=0; i<affectedNodeContent.length(); i++)
 			switch(affectedNodeContent.charAt(i)) {
