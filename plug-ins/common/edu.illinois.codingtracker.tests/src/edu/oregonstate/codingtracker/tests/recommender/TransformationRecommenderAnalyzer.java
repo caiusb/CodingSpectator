@@ -1,12 +1,24 @@
 package edu.oregonstate.codingtracker.tests.recommender;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.operations.UserOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperation;
+import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
+import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
+	
+	private final Map<Long, UnknownTransformationDescriptor> transformationKinds= new TreeMap<Long, UnknownTransformationDescriptor>();
+
+	private final Map<Long, OperationFilePair> atomicTransformations= new TreeMap<Long, OperationFilePair>();
+	
+	private final File transformationKindsFile = new File(Configuration.postprocessorRootFolderName, Configuration.TRANSFORMATION_KINDS_FILE);
 
 	@Override
 	protected String getTableHeader() {
