@@ -27,12 +27,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 	private final Map<Long, OperationFilePair> atomicTransformations = new TreeMap<Long, OperationFilePair>();
 
-	private final File transformationKindsFile = new File(
-			Configuration.postprocessorRootFolderName,
+	private final File transformationKindsFile = new File(Configuration.postprocessorRootFolderName,
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
-	private final File atomicTransformationsFile = new File(
-			Configuration.postprocessorRootFolderName,
+	private final File atomicTransformationsFile = new File(Configuration.postprocessorRootFolderName,
 			Configuration.ATOMIC_TRANSFORMATIONS_FILE);
 
 	/**
@@ -42,19 +40,13 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		CsvListReader csvReader = null;
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = new TreeMap<Long, UnknownTransformationDescriptor>();
 		try {
-			csvReader = new CsvListReader(new FileReader(
-					transformationKindsFile), CsvPreference.STANDARD_PREFERENCE);
+			csvReader = new CsvListReader(new FileReader(transformationKindsFile), CsvPreference.STANDARD_PREFERENCE);
 			List<Object> transformations;
 			csvReader.getHeader(true);
-			while ((transformations = csvReader
-					.read(getTransformationKindsCSVProcessors())) != null) {
-				transformationKinds.put(
-						(Long) transformations.get(0),
-						new UnknownTransformationDescriptor(OperationKind
-								.valueOf((String) transformations.get(1)),
-								(String) transformations.get(2),
-								(String) transformations.get(3),
-								(String) transformations.get(4)));
+			while ((transformations = csvReader.read(getTransformationKindsCSVProcessors())) != null) {
+				transformationKinds.put((Long) transformations.get(0), new UnknownTransformationDescriptor(
+						OperationKind.valueOf((String) transformations.get(1)), (String) transformations.get(2),
+						(String) transformations.get(3), (String) transformations.get(4)));
 			}
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -84,24 +76,16 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		TreeMap<Long, OperationFilePair> atomicTransformations = new TreeMap<Long, OperationFilePair>();
 		CsvListReader reader = null;
 		try {
-			reader = new CsvListReader(
-					new FileReader(atomicTransformationsFile),
-					CsvPreference.STANDARD_PREFERENCE);
+			reader = new CsvListReader(new FileReader(atomicTransformationsFile), CsvPreference.STANDARD_PREFERENCE);
 			reader.getHeader(true);
 			List<Object> atomicTransformation;
-			while ((atomicTransformation = reader
-					.read(getAtomicTransformationsCSVProcessors())) != null) {
+			while ((atomicTransformation = reader.read(getAtomicTransformationsCSVProcessors())) != null) {
 				Long transformationKindID = (Long) atomicTransformation.get(1);
 				Long transformationID = (Long) atomicTransformation.get(0);
-				atomicTransformations.put(transformationID,
-						new OperationFilePair(
-								new InferredUnknownTransformationOperation(
-										transformationKindID, 
-										transformationID,
-										transformationKinds
-												.get(transformationKindID),
-										(Long) atomicTransformation.get(2)),
-								(String) atomicTransformation.get(3)));
+				atomicTransformations.put(transformationID, new OperationFilePair(
+						new InferredUnknownTransformationOperation(transformationKindID, transformationID,
+								transformationKinds.get(transformationKindID), (Long) atomicTransformation.get(2)),
+						(String) atomicTransformation.get(3)));
 			}
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -115,8 +99,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	}
 
 	private CellProcessor[] getAtomicTransformationsCSVProcessors() {
-		return new CellProcessor[] { new ParseLong(), new ParseLong(),
-				new ParseLong(), null };
+		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
 	@Override
