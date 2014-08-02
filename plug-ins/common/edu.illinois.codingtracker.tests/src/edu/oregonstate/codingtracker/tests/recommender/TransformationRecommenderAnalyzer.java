@@ -25,8 +25,6 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.Ope
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
-	private final Map<Long, OperationFilePair> atomicTransformations = new TreeMap<Long, OperationFilePair>();
-
 	private final File transformationKindsFile = new File(Configuration.postprocessorRootFolderName,
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
