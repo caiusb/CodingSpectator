@@ -17,6 +17,7 @@ import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.operations.UserOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.OperationKind;
+import edu.illinois.codingtracker.operations.ast.InferredUnknownTransformationOperation;
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
@@ -30,6 +31,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			Configuration.postprocessorRootFolderName,
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
+	private final File atomicTransformationsFile = new File(
+			Configuration.postprocessorRootFolderName,
+			Configuration.ATOMIC_TRANSFORMATIONS_FILE);
+
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
 	 */
@@ -41,7 +46,8 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 					transformationKindsFile), CsvPreference.STANDARD_PREFERENCE);
 			List<Object> transformations;
 			csvReader.getHeader(true);
-			while ((transformations = csvReader.read(getCSVProcessors())) != null) {
+			while ((transformations = csvReader
+					.read(getTransformationKindsCSVProcessors())) != null) {
 				transformationKinds.put(
 						(Long) transformations.get(0),
 						new UnknownTransformationDescriptor(OperationKind
@@ -68,9 +74,49 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	 * 
 	 * @return an array with the processors
 	 */
-	private CellProcessor[] getCSVProcessors() {
+	private CellProcessor[] getTransformationKindsCSVProcessors() {
 		return new CellProcessor[] { new ParseLong(), null, null, null, null };
 
+	}
+
+	private Map<Long, OperationFilePair> parseAtomicTransformationsFile(
+			Map<Long, UnknownTransformationDescriptor> transformationKinds) {
+		TreeMap<Long, OperationFilePair> atomicTransformations = new TreeMap<Long, OperationFilePair>();
+		CsvListReader reader = null;
+		try {
+			reader = new CsvListReader(
+					new FileReader(atomicTransformationsFile),
+					CsvPreference.STANDARD_PREFERENCE);
+			reader.getHeader(true);
+			List<Object> atomicTransformation;
+			while ((atomicTransformation = reader
+					.read(getAtomicTransformationsCSVProcessors())) != null) {
+				Long transformationKindID = (Long) atomicTransformation.get(1);
+				Long transformationID = (Long) atomicTransformation.get(0);
+				atomicTransformations.put(transformationID,
+						new OperationFilePair(
+								new InferredUnknownTransformationOperation(
+										transformationKindID, 
+										transformationID,
+										transformationKinds
+												.get(transformationKindID),
+										(Long) atomicTransformation.get(2)),
+								(String) atomicTransformation.get(3)));
+			}
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+			}
+		}
+		return atomicTransformations;
+	}
+
+	private CellProcessor[] getAtomicTransformationsCSVProcessors() {
+		return new CellProcessor[] { new ParseLong(), new ParseLong(),
+				new ParseLong(), null };
 	}
 
 	@Override
@@ -99,6 +145,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
+		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 
 		for (UserOperation userOperation : userOperations) {
 			if (!(userOperation instanceof ASTOperation))
