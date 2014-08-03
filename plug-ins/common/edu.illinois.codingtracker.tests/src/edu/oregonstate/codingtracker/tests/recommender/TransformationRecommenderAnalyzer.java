@@ -178,9 +178,43 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		for (UserOperation userOperation : userOperations) {
 			if (!(userOperation instanceof ASTOperation))
 				continue;
+			
+			ASTOperation astOperation = (ASTOperation) userOperation;
+			UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(astOperation.getOperationKind(), astOperation.getNodeType()));
+			
+			// if I can't find a descriptor, oh well, moving on
+			if (existingDescriptor == null)
+				continue;
+			
+			Long transformationID = existingDescriptor.getID();
+			
+			for (TreeSet<Item> itemSet : discoveredItemSets) {
+				tryAndContinueATransformation(candidateTransformations, transformationID);
+				tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
+			}
+
+			System.out.println(candidateTransformations.size());
+			for (CandidateTransformation candidateTransformation : candidateTransformations) {
+				System.out.println(candidateTransformation.getRanking());
+			}
+			System.out.println("----");
 		}
 		
 		return userOperations;
+	}
+
+	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
+			Long transformationID, TreeSet<Item> itemSet) {
+		if (itemSet.contains(transformationID))
+			candidateTransformations.add(new CandidateTransformation(itemSet, new LongItem(transformationID)));
+	}
+
+	private void tryAndContinueATransformation(List<CandidateTransformation> candidateTransformations,
+			Long transformationID) {
+		for (CandidateTransformation transformation : candidateTransformations) {
+			if (transformation.continuesCandidate(new LongItem(transformationID)))
+				transformation.addItem(new LongItem(transformationID));
+		}
 	}
 
 	private Long hash(OperationKind operationKind, String affectedNodeContent) {
