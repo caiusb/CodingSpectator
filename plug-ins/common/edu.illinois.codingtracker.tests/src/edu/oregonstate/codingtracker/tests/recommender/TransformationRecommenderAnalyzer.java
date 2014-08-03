@@ -231,6 +231,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	private Long hash(OperationKind operationKind, String affectedNodeType) {
 		return (long) (operationKind.hashCode() + affectedNodeType.hashCode() + 31);
 	}
+	
+	@Override
+	protected String getRecordFileName() {
+		return "codechanges.txt.inferred_ast_operations";
 	}
 
 	@Override
