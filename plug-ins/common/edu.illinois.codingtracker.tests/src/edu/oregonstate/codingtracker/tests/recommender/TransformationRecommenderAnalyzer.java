@@ -202,8 +202,9 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
 			Long transformationID, TreeSet<Item> itemSet) {
-		if (itemSet.contains(transformationID))
-			candidateTransformations.add(new CandidateTransformation(itemSet, new LongItem(transformationID)));
+		LongItem item = new LongItem(transformationID);
+		if (itemSet.contains(item))
+			candidateTransformations.add(new CandidateTransformation(itemSet, item));
 	}
 
 	private List<CandidateTransformation> tryAndContinueATransformation(List<CandidateTransformation> candidateTransformations,
