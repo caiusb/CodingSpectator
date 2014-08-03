@@ -14,6 +14,8 @@ import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.Operatio
  * 
  */
 public class UnknownTransformationDescriptor {
+	
+	private final Long ID;
 
 	private final OperationKind operationKind;
 
@@ -26,11 +28,16 @@ public class UnknownTransformationDescriptor {
 	// private final String containerNodeType; //Should we care about the parent node's type?
 
 
-	public UnknownTransformationDescriptor(OperationKind operationKind, String affectedNodeType, String affectedNodeContent, String abstractedNodeContent) {
+	public UnknownTransformationDescriptor(Long ID, OperationKind operationKind, String affectedNodeType, String affectedNodeContent, String abstractedNodeContent) {
+		this.ID = ID;
 		this.operationKind= operationKind;
 		this.affectedNodeType= affectedNodeType;
 		this.affectedNodeContent= affectedNodeContent;
 		this.abstractedNodeContent= abstractedNodeContent;
+	}
+	
+	public UnknownTransformationDescriptor(OperationKind operationKind, String affectedNodeType, String affectedNodeContent, String abstractedNodeContent) {
+		this(0L,operationKind,affectedNodeType,affectedNodeContent,abstractedNodeContent);
 	}
 
 	public void populateTextChunk(OperationTextChunk textChunk) {
@@ -100,6 +107,10 @@ public class UnknownTransformationDescriptor {
 		if (operationKind != other.operationKind)
 			return false;
 		return true;
+	}
+	
+	public Long getID() {
+		return ID;
 	}
 
 }
