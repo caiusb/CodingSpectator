@@ -29,4 +29,9 @@ public class CandidateTransformation {
 		return ((float) discoveredItems.size()) / itemSet.size();
 	}
 
+	public void addItem(Item item) {
+		if (!discoveredItems.contains(item))
+			discoveredItems.add(item);
+	}
+
 }
