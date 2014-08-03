@@ -51,7 +51,8 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			List<Object> transformations;
 			csvReader.getHeader(true);
 			while ((transformations = csvReader.read(getTransformationKindsCSVProcessors())) != null) {
-				transformationKinds.put((Long) transformations.get(0), new UnknownTransformationDescriptor(
+				Long transformationID = (Long) transformations.get(0);
+				transformationKinds.put(transformationID, new UnknownTransformationDescriptor(transformationID,
 						OperationKind.valueOf((String) transformations.get(1)), (String) transformations.get(2),
 						(String) transformations.get(3), (String) transformations.get(4)));	
 			}
