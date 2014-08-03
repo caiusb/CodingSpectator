@@ -19,7 +19,7 @@ public class Configuration {
 
 	public static final boolean isOldASTFormat= System.getenv("OLD_AST_CODINGTRACKER_FORMAT") != null;
 
-	public static final String postprocessorRootFolderName= "/Users/caius/osu/TransformationRecommender/CodingTracker/postprocessor_root"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
+	public static final String postprocessorRootFolderName= "/Users/caius/osu/TransformationRecommender/play/test-data"; //System.getenv("POSTPROCESSOR_ROOT_FOLDER");
 
 	public static final long usageTimeStart;
 
@@ -27,9 +27,9 @@ public class Configuration {
 
 	public static final boolean isInPostprocessMode= true;
 
-	public static final boolean isInASTInferenceMode= false; //System.getenv("AST_INFERENCE_MODE") != null;
+	public static final boolean isInASTInferenceMode= true; //System.getenv("AST_INFERENCE_MODE") != null;
 
-	public static final boolean isInRefactoringInferenceMode= true; //System.getenv("REFACTORING_INFERENCE_MODE") != null;
+	public static final boolean isInRefactoringInferenceMode= false; //System.getenv("REFACTORING_INFERENCE_MODE") != null;
 
 	public static final boolean isInReplayMode= true; //System.getenv("REPLAY_MODE") != null;
 
@@ -47,9 +47,11 @@ public class Configuration {
 	
 	public static final String ATOMIC_TRANSFORMATIONS_FILE = "atomicTransformations.txt";
 	
+	public static final String TRAINING_DATA_FOLDER = "/Users/caius/osu/TransformationRecommender/play/training-data";
+	
 	public static final String MINING_RESULTS_FOLDER = "MiningResults";
 
-	public static final String ITEM_SETS_FOLDER = "Size";
+	public static final String ITEM_SETS_FOLDER = "MiningResults/Size";
 
 	static {
 		String envUsageTimeStart= System.getenv("USAGE_TIME_START");

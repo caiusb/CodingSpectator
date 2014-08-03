@@ -31,13 +31,13 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.Ope
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
-	private final File transformationKindsFile = new File(Configuration.postprocessorRootFolderName,
+	private final File transformationKindsFile = new File(Configuration.TRAINING_DATA_FOLDER,
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
-	private final File atomicTransformationsFile = new File(Configuration.postprocessorRootFolderName,
+	private final File atomicTransformationsFile = new File(Configuration.TRAINING_DATA_FOLDER,
 			Configuration.ATOMIC_TRANSFORMATIONS_FILE);
 	
-	private final File itemSetsFolder = new File(new File(Configuration.postprocessorRootFolderName,Configuration.MINING_RESULTS_FOLDER),
+	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER,
 			Configuration.ITEM_SETS_FOLDER);
 	
 	/**
