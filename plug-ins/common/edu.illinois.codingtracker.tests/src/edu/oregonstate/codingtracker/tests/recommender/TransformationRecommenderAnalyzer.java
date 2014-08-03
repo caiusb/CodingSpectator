@@ -166,9 +166,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
 		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
-			OperationKind operationKind = descriptor.getOperationKind();
-			String affectedNodeContent = descriptor.getAffectedNodeContent();
-			Long hash = hash(operationKind, affectedNodeContent);
+			Long hash = hash(descriptor);
 			astMappedTransformationKinds.put(hash, descriptor);
 		}
 		
@@ -214,10 +212,16 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			if (transformation.continuesCandidate(new LongItem(transformationID)))
 				transformation.addItem(new LongItem(transformationID));
 		}
+
+	private Long hash(UnknownTransformationDescriptor descriptor) {
+		OperationKind operationKind = descriptor.getOperationKind();
+		String affectedNodeType = descriptor.getAffectedNodeType();
+		return hash(operationKind, affectedNodeType);
 	}
 
-	private Long hash(OperationKind operationKind, String affectedNodeContent) {
-		return (long) (operationKind.hashCode() + affectedNodeContent.hashCode() + 31);
+	private Long hash(OperationKind operationKind, String affectedNodeType) {
+		return (long) (operationKind.hashCode() + affectedNodeType.hashCode() + 31);
+	}
 	}
 
 	@Override
