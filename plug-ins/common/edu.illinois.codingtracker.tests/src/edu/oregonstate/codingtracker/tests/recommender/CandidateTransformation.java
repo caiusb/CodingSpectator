@@ -36,7 +36,7 @@ public class CandidateTransformation {
 
 	@Override
 	public String toString() {
-		return getRanking() + " " + itemSet; 
+		return getRanking() + " " + discoveredItems + "/" + itemSet; 
 	}
 
 }
