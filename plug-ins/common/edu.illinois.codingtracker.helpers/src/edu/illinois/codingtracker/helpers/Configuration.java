@@ -49,6 +49,8 @@ public class Configuration {
 	
 	public static final String MINING_RESULTS_FOLDER = "MiningResults";
 
+	public static final String ITEM_SETS_FOLDER = "Size";
+
 	static {
 		String envUsageTimeStart= System.getenv("USAGE_TIME_START");
 		if (envUsageTimeStart != null) {

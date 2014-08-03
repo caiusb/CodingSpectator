@@ -1,12 +1,16 @@
 package edu.oregonstate.codingtracker.tests.recommender;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -20,6 +24,8 @@ import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.Operatio
 import edu.illinois.codingtracker.operations.ast.InferredUnknownTransformationOperation;
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
+import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
+import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
 
@@ -30,7 +36,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 	private final File atomicTransformationsFile = new File(Configuration.postprocessorRootFolderName,
 			Configuration.ATOMIC_TRANSFORMATIONS_FILE);
-
+	
+	private final File itemSetsFolder = new File(new File(Configuration.postprocessorRootFolderName,Configuration.MINING_RESULTS_FOLDER),
+			Configuration.ITEM_SETS_FOLDER);
+	
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
 	 */
@@ -44,7 +53,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			while ((transformations = csvReader.read(getTransformationKindsCSVProcessors())) != null) {
 				transformationKinds.put((Long) transformations.get(0), new UnknownTransformationDescriptor(
 						OperationKind.valueOf((String) transformations.get(1)), (String) transformations.get(2),
-						(String) transformations.get(3), (String) transformations.get(4)));
+						(String) transformations.get(3), (String) transformations.get(4)));	
 			}
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -99,6 +108,31 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	private CellProcessor[] getAtomicTransformationsCSVProcessors() {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
+	
+	private List<TreeSet<Item>> parseItemSets() {
+		List<TreeSet<Item>> discoveredItemSets = new ArrayList<TreeSet<Item>>();
+		
+		File[] itemSetFiles = itemSetsFolder.listFiles();
+		for (File itemSetFile : itemSetFiles) {
+			TreeSet<Item> currentItemSet = new TreeSet<Item>();
+			discoveredItemSets.add(currentItemSet);
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(itemSetFile));
+				String itemSetLine = reader.readLine();
+				String[] bits = itemSetLine.split(":");
+				String itemSet = bits[1];
+				itemSet = itemSet.substring(2, itemSet.length() - 2);
+				String[] items = itemSet.split(", ");
+				for (String item : items) {
+					currentItemSet.add(new LongItem(Long.parseLong(item)));
+				}
+			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
+			}
+		}
+
+		return discoveredItemSets;
+	}
 
 	@Override
 	protected String getTableHeader() {
@@ -127,12 +161,13 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
+		List<TreeSet<Item>> discoveredItemSets = parseItemSets();
 
 		for (UserOperation userOperation : userOperations) {
 			if (!(userOperation instanceof ASTOperation))
 				continue;
-
 		}
+		
 		return userOperations;
 	}
 
