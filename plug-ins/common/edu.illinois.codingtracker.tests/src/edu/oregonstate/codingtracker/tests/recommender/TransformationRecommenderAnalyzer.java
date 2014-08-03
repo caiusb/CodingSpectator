@@ -195,7 +195,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
 			System.out.println(candidateTransformations.size());
 			for (CandidateTransformation candidateTransformation : candidateTransformations) {
-				System.out.println(candidateTransformation.getRanking());
+				System.out.println(candidateTransformation);
 			}
 			System.out.println("----");
 		}

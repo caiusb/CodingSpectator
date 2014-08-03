@@ -34,4 +34,9 @@ public class CandidateTransformation {
 			discoveredItems.add(item);
 	}
 
+	@Override
+	public String toString() {
+		return getRanking() + " " + itemSet; 
+	}
+
 }
