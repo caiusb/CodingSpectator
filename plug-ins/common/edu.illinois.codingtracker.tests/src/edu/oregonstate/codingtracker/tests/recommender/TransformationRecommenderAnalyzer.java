@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -164,12 +165,26 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets();
 
+		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
+		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
+			OperationKind operationKind = descriptor.getOperationKind();
+			String affectedNodeContent = descriptor.getAffectedNodeContent();
+			Long hash = hash(operationKind, affectedNodeContent);
+			astMappedTransformationKinds.put(hash, descriptor);
+		}
+		
+		List<CandidateTransformation> candidateTransformations = new ArrayList<CandidateTransformation>();
+		
 		for (UserOperation userOperation : userOperations) {
 			if (!(userOperation instanceof ASTOperation))
 				continue;
 		}
 		
 		return userOperations;
+	}
+
+	private Long hash(OperationKind operationKind, String affectedNodeContent) {
+		return (long) (operationKind.hashCode() + affectedNodeContent.hashCode() + 31);
 	}
 
 	@Override
