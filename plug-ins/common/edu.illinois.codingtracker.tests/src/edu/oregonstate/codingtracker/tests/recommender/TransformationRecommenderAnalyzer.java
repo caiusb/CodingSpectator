@@ -186,7 +186,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			Long transformationID = existingDescriptor.getID();
 			
 			for (TreeSet<Item> itemSet : discoveredItemSets) {
-				tryAndContinueATransformation(candidateTransformations, transformationID);
+				candidateTransformations = tryAndContinueATransformation(candidateTransformations, transformationID);
 				tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 			}
 
@@ -206,12 +206,20 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			candidateTransformations.add(new CandidateTransformation(itemSet, new LongItem(transformationID)));
 	}
 
-	private void tryAndContinueATransformation(List<CandidateTransformation> candidateTransformations,
+	private List<CandidateTransformation> tryAndContinueATransformation(List<CandidateTransformation> candidateTransformations,
 			Long transformationID) {
+		ArrayList<CandidateTransformation> remainingTransformations = new ArrayList<CandidateTransformation>();
 		for (CandidateTransformation transformation : candidateTransformations) {
-			if (transformation.continuesCandidate(new LongItem(transformationID)))
+			if (transformation.continuesCandidate(new LongItem(transformationID))) {
 				transformation.addItem(new LongItem(transformationID));
+				float ranking = transformation.getRanking();
+				if (1 - ranking < 0.05)
+					System.out.println("Found a very likely transformation: " + ranking);
+				remainingTransformations.add(transformation);
+			}
 		}
+		return remainingTransformations;
+	}
 
 	private Long hash(UnknownTransformationDescriptor descriptor) {
 		OperationKind operationKind = descriptor.getOperationKind();
