@@ -163,6 +163,10 @@ public class ASTOperation extends UserOperation {
 	public void replay() {
 		//do nothing
 	}
+	
+	public CompositeNodeDescriptor getAffectedNodeDescriptor() {
+		return affectedNodeDescriptor;
+	}
 
 	@Override
 	public String toString() {
