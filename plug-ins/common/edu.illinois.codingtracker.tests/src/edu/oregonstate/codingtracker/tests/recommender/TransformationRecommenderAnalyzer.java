@@ -183,7 +183,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			
 			ASTOperation astOperation = (ASTOperation) userOperation;
 
-			UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(astOperation.getOperationKind(), astOperation.getNodeText()));
+			UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(astOperation.getOperationKind(), astOperation.getNodeType()));
 
 			// if I can't find a descriptor, oh well, moving on
 			if (existingDescriptor == null)
