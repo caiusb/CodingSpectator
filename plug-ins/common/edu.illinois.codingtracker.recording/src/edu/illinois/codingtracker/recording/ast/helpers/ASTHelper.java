@@ -224,7 +224,7 @@ public class ASTHelper {
 
 	//TODO: Should the parser be created once and then just reused?
 	private static ASTParser createParser() {
-		ASTParser parser= ASTParser.newParser(AST.JLS3);
+		ASTParser parser= ASTParser.newParser(AST.JLS4);
 		parser.setStatementsRecovery(true);
 		parser.setIgnoreMethodBodies(false);
 		//To speed up the parsing, avoid resolving bindings unless it is necessary.

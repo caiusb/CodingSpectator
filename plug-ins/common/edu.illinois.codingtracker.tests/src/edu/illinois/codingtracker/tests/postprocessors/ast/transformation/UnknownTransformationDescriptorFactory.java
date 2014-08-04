@@ -43,7 +43,7 @@ public class UnknownTransformationDescriptorFactory {
 
 	private static String getAbstractedNodeContent(ASTNode node) {
 		resetMappings();
-		ASTNode copyNode= ASTNode.copySubtree(AST.newAST(AST.JLS3), node);
+		ASTNode copyNode= ASTNode.copySubtree(AST.newAST(AST.JLS4), node);
 		copyNode.accept(new ASTVisitor() {
 
 			@Override
