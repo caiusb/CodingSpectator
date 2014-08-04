@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -29,8 +28,6 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
-import edu.illinois.codingtracker.tests.postprocessors.ast.helpers.InferenceHelper;
-import edu.illinois.codingtracker.tests.postprocessors.ast.transformation.UnknownTransformationDescriptorFactory;
 
 public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 
