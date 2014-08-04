@@ -196,7 +196,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				long startTime = System.nanoTime();
 				for (ASTOperation operation : operationCache) {
 
-					//ASTNode affectedNode = InferenceHelper.getAffectedNode(operation);
 					ASTNode affectedNode = getNodeForOperation(operation);
 					if (affectedNode == null) { // can't find the affected node. Should be problematic, but I'm ignoring it for now
 						System.out.println("Oops something went wrong");
@@ -221,7 +220,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 					}
 
-//					stringBuffer.append(candidateTransformations.size() + "\n");
+//					stringBuffer.append(candidatehTransformations.size() + "\n");
 //					for (CandidateTransformation candidateTransformation : candidateTransformations) {
 //						stringBuffer.append(candidateTransformation + "\n");
 //					}
@@ -254,6 +253,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return userOperations;
 	}
 
+	@SuppressWarnings("static-access")
 	private ASTNode getNodeForOperation(ASTOperation operation) {
 		IEditorPart currentEditor = operation.getCurrentEditor();
 		IEditorInput editorInput = currentEditor.getEditorInput();
