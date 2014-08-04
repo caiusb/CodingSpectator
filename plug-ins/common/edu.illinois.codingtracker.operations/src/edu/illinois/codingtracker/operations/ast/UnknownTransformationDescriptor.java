@@ -79,7 +79,7 @@ public class UnknownTransformationDescriptor {
 	public int hashCode() {
 		final int prime= 11;
 		int result= 1;
-		result= prime * result + ((abstractedNodeContent == null) ? 0 : abstractedNodeContent.hashCode());
+//		result= prime * result + ((abstractedNodeContent == null) ? 0 : abstractedNodeContent.hashCode());
 		result= prime * result + ((affectedNodeType == null) ? 0 : affectedNodeType.hashCode());
 		result= prime * result + ((operationKind == null) ? 0 : operationKind.hashCode());
 		return result;
@@ -94,11 +94,11 @@ public class UnknownTransformationDescriptor {
 		if (getClass() != obj.getClass())
 			return false;
 		UnknownTransformationDescriptor other= (UnknownTransformationDescriptor)obj;
-		if (abstractedNodeContent == null) {
-			if (other.abstractedNodeContent != null)
-				return false;
-		} else if (!abstractedNodeContent.equals(other.abstractedNodeContent))
-			return false;
+//		if (abstractedNodeContent == null) {
+//			if (other.abstractedNodeContent != null)
+//				return false;
+//		} else if (!abstractedNodeContent.equals(other.abstractedNodeContent))
+//			return false;
 		if (affectedNodeType == null) {
 			if (other.affectedNodeType != null)
 				return false;
