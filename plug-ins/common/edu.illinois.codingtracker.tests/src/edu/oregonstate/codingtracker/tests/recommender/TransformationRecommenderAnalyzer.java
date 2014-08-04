@@ -178,38 +178,29 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		List<CandidateTransformation> candidateTransformations = new ArrayList<CandidateTransformation>();
 		
 		for (UserOperation userOperation : userOperations) {
-			if (userOperation instanceof ASTOperation) {
+			if (!(userOperation instanceof ASTOperation))
+				continue;
 			
-				ASTOperation astOperation = (ASTOperation) userOperation;
-				ASTNode affectedNode = InferenceHelper.getAffectedNode(astOperation);
-				if (affectedNode == null) // can't find the affected node. Should be problematic, but I'm ignoring it for now
-					continue;
-				
-				UnknownTransformationDescriptor currentDescriptor = UnknownTransformationDescriptorFactory.createDescriptor(astOperation.getOperationKind(), affectedNode);
-				UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(currentDescriptor));
-				
-				// if I can't find a descriptor, oh well, moving on
-				if (existingDescriptor == null)
-					continue;
-				
-				Long transformationID = existingDescriptor.getID();
-				
-				for (TreeSet<Item> itemSet : discoveredItemSets) {
-					candidateTransformations = tryAndContinueATransformation(candidateTransformations, transformationID);
-					tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
-				}
-				
-				stringBuffer.append(candidateTransformations.size() + "\n");
-				for (CandidateTransformation candidateTransformation : candidateTransformations) {
-					stringBuffer.append(candidateTransformation + "\n");
-				}
-				stringBuffer.append("----\n");
-			} else {
-			try {
-					userOperation.replay();
-				} catch (Exception e) {
-				}
+			ASTOperation astOperation = (ASTOperation) userOperation;
+
+			UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(astOperation.getOperationKind(), astOperation.getNodeText()));
+
+			// if I can't find a descriptor, oh well, moving on
+			if (existingDescriptor == null)
+				continue;
+
+			Long transformationID = existingDescriptor.getID();
+
+			for (TreeSet<Item> itemSet : discoveredItemSets) {
+				candidateTransformations = tryAndContinueATransformation(candidateTransformations, transformationID);
+				tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 			}
+
+			stringBuffer.append(candidateTransformations.size() + "\n");
+			for (CandidateTransformation candidateTransformation : candidateTransformations) {
+				stringBuffer.append(candidateTransformation + "\n");
+			}
+			stringBuffer.append("----\n");
 		}
 		
 		return userOperations;
@@ -240,12 +231,11 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	private Long hash(UnknownTransformationDescriptor descriptor) {
 		OperationKind operationKind = descriptor.getOperationKind();
 		String affectedNodeType = descriptor.getAffectedNodeType();
-		String abstractedNodeContent = descriptor.getAbstractedNodeContent();
-		return hash(operationKind, affectedNodeType, abstractedNodeContent);
+		return hash(operationKind, affectedNodeType);
 	}
 
-	private Long hash(OperationKind operationKind, String affectedNodeType, String abstractedNodeContent) {
-		return (long) (operationKind.hashCode()*31) ^ affectedNodeType.hashCode() ^ abstractedNodeContent.hashCode();
+	private Long hash(OperationKind operationKind, String affectedNodeType) {
+		return (long) (operationKind.hashCode()*31) ^ affectedNodeType.hashCode();
 	}
 	
 	@Override
