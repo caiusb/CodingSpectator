@@ -41,7 +41,7 @@ public class Configuration {
 
 	public static final long miningMaxOutputItemSetsCount;
 
-	public static final int minimumSizeThreshold = 20;
+	public static final int minimumSizeThreshold = 10;
 
 	public static final String TRANSFORMATION_KINDS_FILE = "transformationKinds.csv";
 	
