@@ -1,9 +1,12 @@
 package edu.oregonstate.codingtracker.tests.recommender;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
+import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public class CandidateTransformation {
 
@@ -37,6 +40,23 @@ public class CandidateTransformation {
 	@Override
 	public String toString() {
 		return getRanking() + " " + discoveredItems + "/" + itemSet; 
+	}
+	
+	public String getTransformationInHumanTerms(Map<Long, UnknownTransformationDescriptor> transformationKinds) {
+		String result = "[";
+		for (Item item : itemSet) {
+			UnknownTransformationDescriptor transformationDescriptor = transformationKinds.get(((LongItem)item).getValue());
+			result += "(";
+			result += transformationDescriptor.getOperationKind();
+			result += ":";
+			result += transformationDescriptor.getAffectedNodeType();
+			result += ")";
+			result += ";";
+		}
+		result = result.substring(0, result.length() - 1);
+		result += "]";
+		return result;
+		
 	}
 
 }
