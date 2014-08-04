@@ -44,5 +44,9 @@ public class LongItem implements Item {
 	public String toString() {
 		return String.valueOf(value);
 	}
+	
+	public Long getValue() {
+		return value;
+	}
 
 }
