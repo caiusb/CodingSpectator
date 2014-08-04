@@ -11,7 +11,7 @@ package edu.illinois.codingtracker.helpers;
  */
 public class Configuration {
 
-	public static final boolean isInDebugMode= true;//System.getenv("DEBUG_MODE") != null;
+	public static final boolean isInDebugMode= false;//System.getenv("DEBUG_MODE") != null;
 
 	public static final boolean isInTestMode= System.getenv("TEST_MODE") != null;
 
