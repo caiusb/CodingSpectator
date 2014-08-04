@@ -12,7 +12,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -22,29 +32,28 @@ import edu.illinois.codingtracker.helpers.Configuration;
 import edu.illinois.codingtracker.operations.UserOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperation;
 import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.OperationKind;
+import edu.illinois.codingtracker.operations.ast.CompositeNodeDescriptor;
 import edu.illinois.codingtracker.operations.ast.InferredUnknownTransformationOperation;
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
-import edu.illinois.codingtracker.tests.analyzers.CSVProducingAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
-import edu.illinois.codingtracker.tests.postprocessors.ast.helpers.InferenceHelper;
+import edu.illinois.codingtracker.tests.postprocessors.ast.ASTPostprocessor;
 import edu.illinois.codingtracker.tests.postprocessors.ast.transformation.UnknownTransformationDescriptorFactory;
 
-public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
+public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 	private final File transformationKindsFile = new File(Configuration.TRAINING_DATA_FOLDER,
 			Configuration.TRANSFORMATION_KINDS_FILE);
 
 	private final File atomicTransformationsFile = new File(Configuration.TRAINING_DATA_FOLDER,
 			Configuration.ATOMIC_TRANSFORMATIONS_FILE);
-	
-	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER,
-			Configuration.ITEM_SETS_FOLDER);
+
+	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER, Configuration.ITEM_SETS_FOLDER);
 
 	private StringBuffer stringBuffer = new StringBuffer();;
-	
+
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
 	 */
@@ -59,7 +68,7 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 				Long transformationID = (Long) transformations.get(0);
 				transformationKinds.put(transformationID, new UnknownTransformationDescriptor(transformationID,
 						OperationKind.valueOf((String) transformations.get(1)), (String) transformations.get(2),
-						(String) transformations.get(3), (String) transformations.get(4)));	
+						(String) transformations.get(4), (String) transformations.get(3)));
 			}
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
@@ -114,10 +123,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 	private CellProcessor[] getAtomicTransformationsCSVProcessors() {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
-	
+
 	private List<TreeSet<Item>> parseItemSets() {
 		List<TreeSet<Item>> discoveredItemSets = new ArrayList<TreeSet<Item>>();
-		
+
 		File[] itemSetFiles = itemSetsFolder.listFiles();
 		for (File itemSetFile : itemSetFiles) {
 			TreeSet<Item> currentItemSet = new TreeSet<Item>();
@@ -138,11 +147,6 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		}
 
 		return discoveredItemSets;
-	}
-
-	@Override
-	protected String getTableHeader() {
-		return "";
 	}
 
 	/**
@@ -174,45 +178,101 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			Long hash = hash(descriptor);
 			astMappedTransformationKinds.put(hash, descriptor);
 		}
-		
+
 		List<CandidateTransformation> candidateTransformations = new ArrayList<CandidateTransformation>();
+
+		List<ASTOperation> operationCache = new ArrayList<ASTOperation>();
+		
+		int missedNodes = 0;
+		
+		stringBuffer.append("Timestamp,HighestRankingTransformation,Transformation,Duration(milis)\n");
 		
 		for (UserOperation userOperation : userOperations) {
 			if (userOperation instanceof ASTOperation) {
-			
+
 				ASTOperation astOperation = (ASTOperation) userOperation;
-				ASTNode affectedNode = InferenceHelper.getAffectedNode(astOperation);
-				if (affectedNode == null) // can't find the affected node. Should be problematic, but I'm ignoring it for now
-					continue;
-				
-				UnknownTransformationDescriptor currentDescriptor = UnknownTransformationDescriptorFactory.createDescriptor(astOperation.getOperationKind(), affectedNode);
-				UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds.get(hash(currentDescriptor));
-				
-				// if I can't find a descriptor, oh well, moving on
-				if (existingDescriptor == null)
-					continue;
-				
-				Long transformationID = existingDescriptor.getID();
-				
-				for (TreeSet<Item> itemSet : discoveredItemSets) {
-					candidateTransformations = tryAndContinueATransformation(candidateTransformations, transformationID);
-					tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
-				}
-				
-				stringBuffer.append(candidateTransformations.size() + "\n");
-				for (CandidateTransformation candidateTransformation : candidateTransformations) {
-					stringBuffer.append(candidateTransformation + "\n");
-				}
-				stringBuffer.append("----\n");
+				operationCache.add(astOperation);
 			} else {
-			try {
-					userOperation.replay();
-				} catch (Exception e) {
+				long startTime = System.nanoTime();
+				for (ASTOperation operation : operationCache) {
+
+					//ASTNode affectedNode = InferenceHelper.getAffectedNode(operation);
+					ASTNode affectedNode = getNodeForOperation(operation);
+					if (affectedNode == null) { // can't find the affected node. Should be problematic, but I'm ignoring it for now
+						System.out.println("Oops something went wrong");
+						missedNodes++;
+						continue;
+					}
+
+					UnknownTransformationDescriptor currentDescriptor = UnknownTransformationDescriptorFactory
+							.createDescriptor(operation.getOperationKind(), affectedNode);
+					UnknownTransformationDescriptor existingDescriptor = astMappedTransformationKinds
+							.get(hash(currentDescriptor));
+
+					// if I can't find a descriptor, oh well, moving on
+					if (existingDescriptor == null)
+						continue;
+
+					Long transformationID = existingDescriptor.getID();
+
+					for (TreeSet<Item> itemSet : discoveredItemSets) {
+						candidateTransformations = tryAndContinueATransformation(candidateTransformations,
+								transformationID);
+						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
+					}
+
+//					stringBuffer.append(candidateTransformations.size() + "\n");
+//					for (CandidateTransformation candidateTransformation : candidateTransformations) {
+//						stringBuffer.append(candidateTransformation + "\n");
+//					}
+//					stringBuffer.append("----\n");
+					
 				}
+				long endTime = System.nanoTime();
+				
+				float maxRanking = 0;
+				CandidateTransformation highestRankedTransformation = null;
+				for (CandidateTransformation transformation : candidateTransformations) {
+					float ranking = transformation.getRanking();
+					if (ranking > maxRanking) {
+						maxRanking = ranking;
+						highestRankedTransformation = transformation;
+					}
+				}
+				operationCache = new ArrayList<ASTOperation>();
+				
+				stringBuffer.append(userOperation.getTime() + "," + 
+						maxRanking +"," + 
+						((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
+						(endTime-startTime)/1000);
+				stringBuffer.append("\n");
 			}
+			replay(userOperation);
 		}
-		
+
+		System.out.println("In total, I missed " + missedNodes + " nodes :(");
 		return userOperations;
+	}
+
+	private ASTNode getNodeForOperation(ASTOperation operation) {
+		IEditorPart currentEditor = operation.getCurrentEditor();
+		IEditorInput editorInput = currentEditor.getEditorInput();
+		IFile file = null;
+		if (editorInput instanceof IFileEditorInput) {
+			file = ((IFileEditorInput)editorInput).getFile();
+		} else {
+			return null;
+		}
+		ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(file);
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(compilationUnit);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		ASTNode rootAST = parser.createAST(new NullProgressMonitor());
+		CompositeNodeDescriptor affectedNodeDescriptor = operation.getAffectedNodeDescriptor();
+		int nodeOffset = affectedNodeDescriptor.getNodeOffset();
+		int nodeLength = affectedNodeDescriptor.getNodeLength();
+		ASTNode affectedNode = NodeFinder.perform(rootAST, nodeOffset, nodeLength);
+		return affectedNode;
 	}
 
 	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
@@ -222,8 +282,8 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 			candidateTransformations.add(new CandidateTransformation(itemSet, item));
 	}
 
-	private List<CandidateTransformation> tryAndContinueATransformation(List<CandidateTransformation> candidateTransformations,
-			Long transformationID) {
+	private List<CandidateTransformation> tryAndContinueATransformation(
+			List<CandidateTransformation> candidateTransformations, Long transformationID) {
 		ArrayList<CandidateTransformation> remainingTransformations = new ArrayList<CandidateTransformation>();
 		for (CandidateTransformation transformation : candidateTransformations) {
 			if (transformation.continuesCandidate(new LongItem(transformationID))) {
@@ -244,10 +304,10 @@ public class TransformationRecommenderAnalyzer extends CSVProducingAnalyzer {
 		return hash(operationKind, affectedNodeType, abstractedNodeContent);
 	}
 
-	private Long hash(OperationKind operationKind, String affectedNodeType, String abstractedNodeContent) {
-		return (long) (operationKind.hashCode()*31) ^ affectedNodeType.hashCode() ^ abstractedNodeContent.hashCode();
+	private long hash(OperationKind operationKind, String affectedNodeType, String abstractedNodeContent) {
+		return (long) (operationKind.hashCode() * 31) ^ affectedNodeType.hashCode() ^ abstractedNodeContent.hashCode();
 	}
-	
+
 	@Override
 	protected String getRecordFileName() {
 		return "codechanges.txt.inferred_ast_operations";
