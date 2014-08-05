@@ -220,11 +220,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 					}
 
-//					stringBuffer.append(candidatehTransformations.size() + "\n");
-//					for (CandidateTransformation candidateTransformation : candidateTransformations) {
-//						stringBuffer.append(candidateTransformation + "\n");
-//					}
-//					stringBuffer.append("----\n");
+					addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 					
 				}
 				
@@ -251,6 +247,15 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 		System.out.println("In total, I missed " + missedNodes + " nodes :(");
 		return userOperations;
+	}
+
+	private void addCandidatesToStringBuffer(List<CandidateTransformation> candidateTransformations,
+			StringBuffer stringBuffer) {
+		stringBuffer.append(candidateTransformations.size() + "\n");
+		for (CandidateTransformation candidateTransformation : candidateTransformations) {
+			stringBuffer.append(candidateTransformation + "\n");
+		}
+		stringBuffer.append("----\n");
 	}
 
 	@SuppressWarnings("static-access")
