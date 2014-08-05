@@ -58,5 +58,13 @@ public class CandidateTransformation {
 		return result;
 		
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof CandidateTransformation))
+			return false;
+		
+		return ((CandidateTransformation)o).itemSet.equals(itemSet);
+	}
 
 }
