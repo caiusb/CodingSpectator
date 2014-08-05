@@ -222,25 +222,26 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 					addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 					
-				}
-				
-				float maxRanking = 0;
-				CandidateTransformation highestRankedTransformation = null;
-				for (CandidateTransformation transformation : candidateTransformations) {
-					float ranking = transformation.getRanking();
-					if (ranking > maxRanking) {
-						maxRanking = ranking;
-						highestRankedTransformation = transformation;
 					long endTime = System.nanoTime();
+					
+					float maxRanking = 0;
+					CandidateTransformation highestRankedTransformation = null;
+					for (CandidateTransformation transformation : candidateTransformations) {
+						float ranking = transformation.getRanking();
+						if (ranking > maxRanking) {
+							maxRanking = ranking;
+							highestRankedTransformation = transformation;
+						}
 					}
+					
+					stringBuffer.append(userOperation.getTime() + "," + 
+							maxRanking +"," +
+							((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
+							(endTime-startTime)/1000000);
+					stringBuffer.append("\n");
 				}
 				operationCache = new ArrayList<ASTOperation>();
 				
-				stringBuffer.append(userOperation.getTime() + "," + 
-						maxRanking +"," + 
-						((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
-						(endTime-startTime)/1000);
-				stringBuffer.append("\n");
 			}
 			replay(userOperation);
 		}
