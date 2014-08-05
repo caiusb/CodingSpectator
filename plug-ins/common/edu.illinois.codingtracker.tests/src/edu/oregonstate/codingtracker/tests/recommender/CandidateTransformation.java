@@ -66,5 +66,9 @@ public class CandidateTransformation {
 		
 		return ((CandidateTransformation)o).itemSet.equals(itemSet);
 	}
-
+	
+	@Override
+	public int hashCode() {
+		return itemSet.hashCode();
+	}
 }
