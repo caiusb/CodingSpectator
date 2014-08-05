@@ -193,8 +193,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				ASTOperation astOperation = (ASTOperation) userOperation;
 				operationCache.add(astOperation);
 			} else {
-				long startTime = System.nanoTime();
 				for (ASTOperation operation : operationCache) {
+					long startTime = System.nanoTime();
 
 					ASTNode affectedNode = getNodeForOperation(operation);
 					if (affectedNode == null) { // can't find the affected node. Should be problematic, but I'm ignoring it for now
@@ -227,7 +227,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 //					stringBuffer.append("----\n");
 					
 				}
-				long endTime = System.nanoTime();
 				
 				float maxRanking = 0;
 				CandidateTransformation highestRankedTransformation = null;
@@ -236,6 +235,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					if (ranking > maxRanking) {
 						maxRanking = ranking;
 						highestRankedTransformation = transformation;
+					long endTime = System.nanoTime();
 					}
 				}
 				operationCache = new ArrayList<ASTOperation>();
