@@ -288,9 +288,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		for (CandidateTransformation transformation : candidateTransformations) {
 			if (transformation.continuesCandidate(new LongItem(transformationID))) {
 				transformation.addItem(new LongItem(transformationID));
-				float ranking = transformation.getRanking();
-				if (ranking > 0.9)
-					System.out.println("Found a very likely transformation: " + transformation);
 				remainingTransformations.add(transformation);
 			}
 		}
