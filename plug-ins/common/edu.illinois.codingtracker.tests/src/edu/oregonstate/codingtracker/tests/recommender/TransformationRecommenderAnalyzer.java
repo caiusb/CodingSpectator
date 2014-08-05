@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,6 +253,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 	private void addCandidatesToStringBuffer(List<CandidateTransformation> candidateTransformations,
 			StringBuffer stringBuffer) {
+		Collections.sort(candidateTransformations, Collections.reverseOrder());
 		stringBuffer.append(candidateTransformations.size() + "\n");
 		for (CandidateTransformation candidateTransformation : candidateTransformations) {
 			stringBuffer.append(candidateTransformation + "\n");
