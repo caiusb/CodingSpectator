@@ -8,7 +8,7 @@ import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
-public class CandidateTransformation {
+public class CandidateTransformation implements Comparable<CandidateTransformation>{
 
 	private Set<Item> itemSet;
 	private Set<Item> discoveredItems;
@@ -70,5 +70,16 @@ public class CandidateTransformation {
 	@Override
 	public int hashCode() {
 		return itemSet.hashCode();
+	}
+
+	@Override
+	public int compareTo(CandidateTransformation o) {
+		float ranking1 = getRanking();
+		float ranking2 = o.getRanking();
+		if (ranking1 < ranking2)
+			return -1;
+		if (ranking1 == ranking2)
+			return 0;
+		return 1;
 	}
 }
