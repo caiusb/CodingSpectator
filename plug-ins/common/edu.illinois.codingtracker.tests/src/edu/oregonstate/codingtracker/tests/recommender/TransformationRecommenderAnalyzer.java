@@ -286,8 +286,12 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
 			Long transformationID, TreeSet<Item> itemSet) {
 		LongItem item = new LongItem(transformationID);
-		if (itemSet.contains(item))
-			candidateTransformations.add(new CandidateTransformation(itemSet, item));
+		if (itemSet.contains(item)) {
+			CandidateTransformation candidateTransformation = new CandidateTransformation(itemSet, item);
+			if (candidateTransformations.contains(candidateTransformation))
+				return;
+			candidateTransformations.add(candidateTransformation);
+		}
 	}
 
 	private List<CandidateTransformation> tryAndContinueATransformation(
