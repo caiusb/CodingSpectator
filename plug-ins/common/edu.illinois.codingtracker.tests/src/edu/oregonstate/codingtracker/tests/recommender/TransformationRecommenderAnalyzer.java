@@ -225,13 +225,13 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					
 					long endTime = System.nanoTime();
 					
-					float maxRanking = 0;
-					CandidateTransformation highestRankedTransformation = null;
+					float maxCompleteness = 0;
+					CandidateTransformation mostCompletedTransformation = null;
 					for (CandidateTransformation transformation : candidateTransformations) {
-						float ranking = transformation.getRanking();
-						if (ranking > maxRanking) {
-							maxRanking = ranking;
-							highestRankedTransformation = transformation;
+						float completeness = transformation.getCompleteness();
+						if (completeness > maxCompleteness) {
+							maxCompleteness = completeness;
+							mostCompletedTransformation = transformation;
 						}
 					}
 					

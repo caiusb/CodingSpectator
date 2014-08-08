@@ -28,7 +28,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 		return false;
 	}
 
-	public float getRanking() {
+	public float getCompleteness() {
 		return ((float) discoveredItems.size()) / itemSet.size();
 	}
 
@@ -39,7 +39,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 
 	@Override
 	public String toString() {
-		return getRanking() + " " + discoveredItems + "/" + itemSet; 
+		return getCompleteness() + " " + discoveredItems + "/" + itemSet; 
 	}
 	
 	public String getTransformationInHumanTerms(Map<Long, UnknownTransformationDescriptor> transformationKinds) {
@@ -74,11 +74,11 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 
 	@Override
 	public int compareTo(CandidateTransformation o) {
-		float ranking1 = getRanking();
-		float ranking2 = o.getRanking();
-		if (ranking1 < ranking2)
+		float completeness1 = getCompleteness();
+		float completeness2 = o.getCompleteness();
+		if (completeness1 < completeness2)
 			return -1;
-		if (ranking1 == ranking2)
+		if (completeness1 == completeness2)
 			return 0;
 		return 1;
 	}
