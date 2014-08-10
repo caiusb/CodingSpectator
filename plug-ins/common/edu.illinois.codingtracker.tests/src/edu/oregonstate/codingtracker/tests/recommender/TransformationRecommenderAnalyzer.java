@@ -53,7 +53,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER, Configuration.ITEM_SETS_FOLDER);
 
-	private StringBuffer stringBuffer = new StringBuffer();;
+	private StringBuffer stringBuffer = new StringBuffer();
 
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
@@ -91,7 +91,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	 */
 	private CellProcessor[] getTransformationKindsCSVProcessors() {
 		return new CellProcessor[] { new ParseLong(), null, null, null, null };
-
 	}
 
 	private Map<Long, OperationFilePair> parseAtomicTransformationsFile(
