@@ -188,11 +188,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		stringBuffer.append("Timestamp,HighestRankingTransformation,Transformation,Duration(milis)\n");
 		
 		for (UserOperation userOperation : userOperations) {
-			if (userOperation instanceof ASTOperation) {
-
-				ASTOperation astOperation = (ASTOperation) userOperation;
-				operationCache.add(astOperation);
-			} else {
+			if (userOperation instanceof ASTOperation)
+				operationCache.add((ASTOperation) userOperation);
+			else {
 				for (ASTOperation operation : operationCache) {
 					long startTime = System.nanoTime();
 
