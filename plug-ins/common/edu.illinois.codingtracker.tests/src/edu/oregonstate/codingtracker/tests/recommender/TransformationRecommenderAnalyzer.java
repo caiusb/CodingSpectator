@@ -253,6 +253,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		Collections.sort(candidateTransformations, Collections.reverseOrder());
 		stringBuffer.append(candidateTransformations.size() + "\n");
 		for (CandidateTransformation candidateTransformation : candidateTransformations) {
+			stringBuffer.append("C:");
 			stringBuffer.append(candidateTransformation + "\n");
 		}
 		stringBuffer.append("----\n");
