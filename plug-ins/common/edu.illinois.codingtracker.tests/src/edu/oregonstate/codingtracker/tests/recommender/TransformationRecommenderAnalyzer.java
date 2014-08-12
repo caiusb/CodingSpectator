@@ -104,9 +104,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			while ((atomicTransformation = reader.read(getAtomicTransformationsCSVProcessors())) != null) {
 				Long transformationKindID = (Long) atomicTransformation.get(1);
 				Long transformationID = (Long) atomicTransformation.get(0);
-				atomicTransformations.put(transformationID, new OperationFilePair(
 				String operationPath = (String) atomicTransformation.get(3);
 				Long timestamp = (Long) atomicTransformation.get(2);
+				atomicTransformations.put(timestamp, new OperationFilePair(
 						new InferredUnknownTransformationOperation(transformationKindID, transformationID,
 								transformationKinds.get(transformationKindID), timestamp),
 						operationPath));
@@ -234,11 +234,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						}
 					}
 					
-					stringBuffer.append(userOperation.getTime() + "," + 
-							maxRanking +"," +
-							((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
-							(endTime-startTime)/1000000);
-					stringBuffer.append("\n");
+//					stringBuffer.append(userOperation.getTime() + "," + 
+//							maxRanking +"," +
+//							((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
+//							(endTime-startTime)/1000000);
+//					stringBuffer.append("\n");
 				}
 				operationCache = new ArrayList<ASTOperation>();
 				
