@@ -105,9 +105,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				Long transformationKindID = (Long) atomicTransformation.get(1);
 				Long transformationID = (Long) atomicTransformation.get(0);
 				atomicTransformations.put(transformationID, new OperationFilePair(
+				String operationPath = (String) atomicTransformation.get(3);
+				Long timestamp = (Long) atomicTransformation.get(2);
 						new InferredUnknownTransformationOperation(transformationKindID, transformationID,
-								transformationKinds.get(transformationKindID), (Long) atomicTransformation.get(2)),
-						(String) atomicTransformation.get(3)));
+								transformationKinds.get(transformationKindID), timestamp),
+						operationPath));
 			}
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
