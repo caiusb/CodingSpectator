@@ -171,7 +171,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	 */
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
+		/* Map<TransformationID, UnknownTransformationDescriptor> */
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
+		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets();
 
