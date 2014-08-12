@@ -106,7 +106,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				Long transformationID = (Long) atomicTransformation.get(0);
 				String operationPath = (String) atomicTransformation.get(3);
 				Long timestamp = (Long) atomicTransformation.get(2);
-				atomicTransformations.put(timestamp, new OperationFilePair(
+				atomicTransformations.put(transformationID, new OperationFilePair(
 						new InferredUnknownTransformationOperation(transformationKindID, transformationID,
 								transformationKinds.get(transformationKindID), timestamp),
 						operationPath));
@@ -176,7 +176,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets();
-
+		
 		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
 		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
 			Long hash = hash(descriptor);
