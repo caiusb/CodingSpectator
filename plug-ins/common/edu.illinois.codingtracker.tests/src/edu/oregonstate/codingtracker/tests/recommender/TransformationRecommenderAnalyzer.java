@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -55,6 +57,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER, Configuration.ITEM_SETS_FOLDER);
 
 	private StringBuffer stringBuffer = new StringBuffer();
+	
+	private long cutoffTimestamp = 1407102349988l;
 
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
@@ -127,7 +131,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
-	private Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets() {
+	private Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets(Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
 		List<TreeSet<Item>> discoveredItemSets = new ArrayList<TreeSet<Item>>();
 
 		File[] itemSetFiles = itemSetsFolder.listFiles();
@@ -153,13 +157,21 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				itemInstances = new TreeMap<Item, List<Long>>();
 				while ((line = reader.readLine()) != null) {
 					String[] itemOccurances = line.split(":");
+					String middleItem = itemOccurances[itemOccurances.length/2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
 					for (String itemOccurance : itemOccurances) {
 						Item item = itemSetIterator.next();
 						String[] transformationKindIDs = itemOccurance.split(",");
 						ArrayList<Long> transformationsList = new ArrayList<Long>();
+						if (middleItem == itemOccurance) {
+							OperationFilePair operationFilePair = atomicTransformations.get(Long.parseLong(transformationKindIDs[0]));
+							long operationTimestamp = operationFilePair.operation.getTime();
+							if (operationTimestamp >= cutoffTimestamp)
+								triggerTimeStamps.add(operationTimestamp);
+						}
 						for (String transformationKindID : transformationKindIDs) {
-							transformationsList.add(Long.parseLong(transformationKindID));
+							long longTransformationKindID = Long.parseLong(transformationKindID);
+							transformationsList.add(longTransformationKindID);
 						}
 						itemInstances.put(item, transformationsList);
 					}
@@ -183,7 +195,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	@Override
 	protected void checkPostprocessingPreconditions() {
 	}
-
+	
 	/**
 	 * I am a processor that tries to recommend changes based on the things
 	 * coming in. For simplicity, I only look at the AST Changes. I already know
@@ -193,12 +205,16 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		/* Map<TransformationID, UnknownTransformationDescriptor> */
-		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
+		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
-		Tuple<List<TreeSet<Item>>,Map<Item,List<Long>>> parseItemSets = parseItemSets();
+		Set<Long> triggerTimeStamps = new HashSet<Long>();
+		Tuple<List<TreeSet<Item>>,Map<Item,List<Long>>> parseItemSets = parseItemSets(atomicTransformations, triggerTimeStamps);
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets.getFirst();
 		Map<Item, List<Long>> itemInstances = parseItemSets.getSecond();
+		
+		int totalTriggers = triggerTimeStamps.size();
+		int actualTriggered = 0;
 		
 		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
 		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
@@ -212,15 +228,21 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		
 		int missedNodes = 0;
 		
-		stringBuffer.append("Timestamp,HighestRankingTransformation,Transformation,Duration(milis)\n");
-		
 		for (UserOperation userOperation : userOperations) {
+			long timestamp = userOperation.getTime();
+			if (timestamp < cutoffTimestamp) {// I do not want to do anything with the training data
+				replay(userOperation);
+				continue;
+			}
+			if (triggerTimeStamps.contains(timestamp)) {
+				addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
+				triggerTimeStamps.remove(timestamp); // two operations at the same time stamp will trigger only once
+				actualTriggered++;
+			}
 			if (userOperation instanceof ASTOperation)
 				operationCache.add((ASTOperation) userOperation);
 			else {
 				for (ASTOperation operation : operationCache) {
-					long startTime = System.nanoTime();
-
 					ASTNode affectedNode = getNodeForOperation(operation);
 					if (affectedNode == null) { // can't find the affected node. Should be problematic, but I'm ignoring it for now
 						System.out.println("Oops something went wrong");
@@ -244,10 +266,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 								transformationID);
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 					}
-
-					addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
-					
-					long endTime = System.nanoTime();
 					
 					float maxCompleteness = 0;
 					CandidateTransformation mostCompletedTransformation = null;
@@ -259,11 +277,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						}
 					}
 					
-//					stringBuffer.append(userOperation.getTime() + "," + 
-//							maxRanking +"," +
-//							((highestRankedTransformation != null) ? highestRankedTransformation.getTransformationInHumanTerms(transformationKinds) : "null") + "," + 
-//							(endTime-startTime)/1000000);
-//					stringBuffer.append("\n");
 				}
 				operationCache = new ArrayList<ASTOperation>();
 				
@@ -272,6 +285,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		}
 
 		System.out.println("In total, I missed " + missedNodes + " nodes :(");
+		System.out.println("Triggered " + actualTriggered + " out of " + totalTriggers + " possible");
 		return userOperations;
 	}
 
