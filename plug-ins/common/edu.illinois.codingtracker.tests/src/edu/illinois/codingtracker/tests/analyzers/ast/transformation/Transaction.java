@@ -73,8 +73,9 @@ public class Transaction {
 			for (long itemInstanceID : itemInstances.get(item))
 				result.append(itemInstanceID).append(",");
 			result.delete(result.length()-2, result.length()); 
-			result.append("||");
+			result.append(":");
 		}
+		result.delete(result.length()-1, result.length());
 		result.append("\n");
 		return result;
 	}
