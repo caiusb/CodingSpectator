@@ -139,7 +139,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				String itemSetLine = reader.readLine();
 				String[] bits = itemSetLine.split(":");
 				String itemSet = bits[1];
-				itemSet = itemSet.substring(2, itemSet.length() - 2);
+				itemSet = itemSet.substring(2, itemSet.length() - 1);
 				String[] items = itemSet.split(", ");
 				for (String item : items) {
 					currentItemSet.add(new LongItem(Long.parseLong(item)));
