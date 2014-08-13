@@ -126,10 +126,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
-	private List<TreeSet<Item>> parseItemSets() {
+	private Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets() {
 		List<TreeSet<Item>> discoveredItemSets = new ArrayList<TreeSet<Item>>();
 
 		File[] itemSetFiles = itemSetsFolder.listFiles();
+		TreeMap<Item, List<Long>> itemInstances = null;
 		for (File itemSetFile : itemSetFiles) {
 			TreeSet<Item> currentItemSet = new TreeSet<Item>();
 			discoveredItemSets.add(currentItemSet);
@@ -148,7 +149,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			}
 		}
 
-		return discoveredItemSets;
+		return new Tuple(discoveredItemSets,itemInstances);
 	}
 
 	/**
@@ -175,7 +176,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
-		List<TreeSet<Item>> discoveredItemSets = parseItemSets();
+		Tuple<List<TreeSet<Item>>,Map<Item,List<Long>>> parseItemSets = parseItemSets();
+		List<TreeSet<Item>> discoveredItemSets = parseItemSets.getFirst();
 		
 		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
 		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
