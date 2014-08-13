@@ -404,7 +404,6 @@ public class UnknownTransformationMiner {
 		result.append("Frequency: ").append(transactionsFrequencyPair.getFrequency()).append("\n");
 		removeDuplicatedInstances(itemSet, transactionIDs);
 		for (int transactionID : transactionIDs) {
-			result.append("Instances for transaction ").append(transactionID).append(": ");
 			result.append(transactions.get(transactionID).getItemSetInstancesAsText(itemSet));
 		}
 		clearRemovedDuplicatedInstances(transactionIDs);

@@ -70,13 +70,9 @@ public class Transaction {
 	public StringBuffer getItemSetInstancesAsText(TreeSet<Item> itemSet) {
 		StringBuffer result= new StringBuffer();
 		for (Item item : itemSet) {
-			for (long itemInstanceID : itemInstances.get(item)) {
-				String marker= "";
-				if (removedDuplicatedInstanceIDs.contains(itemInstanceID)) {
-					marker= "~";
-				}
-				result.append(marker).append(itemInstanceID).append(marker).append(", ");
-			}
+			for (long itemInstanceID : itemInstances.get(item))
+				result.append(itemInstanceID).append(",");
+			result.delete(result.length()-2, result.length()); 
 			result.append("||");
 		}
 		result.append("\n");
