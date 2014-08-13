@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -144,12 +145,31 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				for (String item : items) {
 					currentItemSet.add(new LongItem(Long.parseLong(item)));
 				}
+				
+				reader.readLine(); //Size
+				reader.readLine(); //Frequency 
+				
+				String line;
+				itemInstances = new TreeMap<Item, List<Long>>();
+				while ((line = reader.readLine()) != null) {
+					String[] itemOccurances = line.split(":");
+					Iterator<Item> itemSetIterator = currentItemSet.iterator();
+					for (String itemOccurance : itemOccurances) {
+						Item item = itemSetIterator.next();
+						String[] transformationKindIDs = itemOccurance.split(",");
+						ArrayList<Long> transformationsList = new ArrayList<Long>();
+						for (String transformationKindID : transformationKindIDs) {
+							transformationsList.add(Long.parseLong(transformationKindID));
+						}
+						itemInstances.put(item, transformationsList);
+					}
+				}
 			} catch (FileNotFoundException e) {
 			} catch (IOException e) {
 			}
 		}
 
-		return new Tuple(discoveredItemSets,itemInstances);
+		return new Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>>(discoveredItemSets,itemInstances);
 	}
 
 	/**
@@ -173,11 +193,12 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	@Override
 	protected List<UserOperation> postprocess(List<UserOperation> userOperations) {
 		/* Map<TransformationID, UnknownTransformationDescriptor> */
-		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 		/* Map<Timestamp,OperationFilePair> */
+		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		Tuple<List<TreeSet<Item>>,Map<Item,List<Long>>> parseItemSets = parseItemSets();
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets.getFirst();
+		Map<Item, List<Long>> itemInstances = parseItemSets.getSecond();
 		
 		Map<Long, UnknownTransformationDescriptor> astMappedTransformationKinds = new HashMap<Long, UnknownTransformationDescriptor>();
 		for (UnknownTransformationDescriptor descriptor : transformationKinds.values()) {
