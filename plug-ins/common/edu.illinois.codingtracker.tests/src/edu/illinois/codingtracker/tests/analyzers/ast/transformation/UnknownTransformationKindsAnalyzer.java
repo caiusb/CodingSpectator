@@ -28,7 +28,6 @@ public class UnknownTransformationKindsAnalyzer extends CSVProducingAnalyzer {
 
 	private final Map<Long, TransformationInstances> unknownTransformations= new HashMap<Long, TransformationInstances>();
 
-
 	@Override
 	protected String getTableHeader() {
 		return "username,workspace ID,transformation kind ID,transformations count,timestamps\n";
