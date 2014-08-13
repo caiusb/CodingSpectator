@@ -72,7 +72,7 @@ public class Transaction {
 		for (Item item : itemSet) {
 			for (long itemInstanceID : itemInstances.get(item))
 				result.append(itemInstanceID).append(",");
-			result.delete(result.length()-2, result.length()); 
+			result.delete(result.length()-1, result.length()); 
 			result.append(":");
 		}
 		result.delete(result.length()-1, result.length());
