@@ -78,11 +78,11 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 
 	@Override
 	public int compareTo(CandidateTransformation o) {
-		float completeness1 = getCompleteness();
-		float completeness2 = o.getCompleteness();
-		if (completeness1 < completeness2)
+		float ranking1 = getRanking();
+		float ranking2 = o.getRanking();
+		if (ranking1 < ranking2)
 			return -1;
-		if (completeness1 == completeness2)
+		if (ranking1 == ranking2)
 			return 0;
 		return 1;
 	}
