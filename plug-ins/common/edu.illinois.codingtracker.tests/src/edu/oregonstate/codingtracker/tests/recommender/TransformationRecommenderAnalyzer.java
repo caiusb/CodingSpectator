@@ -141,10 +141,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			discoveredItemSets.add(currentItemSet);
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader(itemSetFile));
-				String itemSetLine = reader.readLine();
-				String[] bits = itemSetLine.split(":");
-				String itemSet = bits[1];
-				itemSet = itemSet.substring(2, itemSet.length() - 1);
+				String thingAfterColon = getThingAfterColon(reader);
+				String itemSet = thingAfterColon.substring(1, thingAfterColon.length() - 1);
 				String[] items = itemSet.split(", ");
 				for (String item : items) {
 					currentItemSet.add(new LongItem(Long.parseLong(item)));
@@ -182,6 +180,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		}
 
 		return new Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>>(discoveredItemSets,itemInstances);
+
+	private String getThingAfterColon(BufferedReader reader) throws IOException {
+		String line = reader.readLine();
+		String thingAfterColon = line.split(":")[1];
+		return thingAfterColon.substring(1, thingAfterColon.length());
 	}
 
 	/**
