@@ -43,7 +43,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 
 	@Override
 	public String toString() {
-		return getCompleteness() + " " + discoveredItems + "/" + itemSet; 
+		return getRanking() + " " + discoveredItems + "/" + itemSet; 
 	}
 	
 	public String getTransformationInHumanTerms(Map<Long, UnknownTransformationDescriptor> transformationKinds) {
