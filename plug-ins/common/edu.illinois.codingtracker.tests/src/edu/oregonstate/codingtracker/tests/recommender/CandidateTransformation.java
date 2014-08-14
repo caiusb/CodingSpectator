@@ -31,6 +31,10 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 	public float getCompleteness() {
 		return ((float) discoveredItems.size()) / itemSet.size();
 	}
+	
+	public float getRanking() {
+		return getCompleteness() * itemSet.size() * itemSet.frequency();
+	}
 
 	public void addItem(Item item) {
 		if (!discoveredItems.contains(item))
