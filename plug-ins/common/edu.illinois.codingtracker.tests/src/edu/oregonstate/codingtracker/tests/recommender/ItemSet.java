@@ -42,7 +42,7 @@ public class ItemSet implements Iterable<Item> {
 		return items.contains(item);
 	}
 
-	public float size() {
+	public int size() {
 		return size;
 	}
 
