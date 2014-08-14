@@ -50,4 +50,8 @@ public class ItemSet implements Iterable<Item> {
 		return frequency;
 	}
 
+	@Override
+	public String toString() {
+		return items.toString();
+	}
 }
