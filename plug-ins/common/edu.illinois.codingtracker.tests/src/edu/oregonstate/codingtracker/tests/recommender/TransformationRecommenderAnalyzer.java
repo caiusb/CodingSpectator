@@ -209,7 +209,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		Set<Long> triggerTimeStamps = new HashSet<Long>();
-		Tuple<List<TreeSet<Item>>,Map<Item,List<Long>>> parseItemSets = parseItemSets(atomicTransformations, triggerTimeStamps);
+		Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets = parseItemSets(atomicTransformations,
+				triggerTimeStamps);
 		List<TreeSet<Item>> discoveredItemSets = parseItemSets.getFirst();
 		Map<Item, List<Long>> itemInstances = parseItemSets.getSecond();
 		
