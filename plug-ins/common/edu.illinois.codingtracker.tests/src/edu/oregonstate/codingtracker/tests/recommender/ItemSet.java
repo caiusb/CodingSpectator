@@ -46,4 +46,8 @@ public class ItemSet implements Iterable<Item> {
 		return size;
 	}
 
+	public int frequency() {
+		return frequency;
+	}
+
 }
