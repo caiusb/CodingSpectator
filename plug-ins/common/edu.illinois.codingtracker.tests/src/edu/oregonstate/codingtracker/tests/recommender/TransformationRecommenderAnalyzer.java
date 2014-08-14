@@ -131,13 +131,13 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
-	private Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets(Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
-		List<TreeSet<Item>> discoveredItemSets = new ArrayList<TreeSet<Item>>();
+	private Tuple<List<ItemSet>, Map<Item, List<Long>>> parseItemSets(Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
+		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
 		File[] itemSetFiles = itemSetsFolder.listFiles();
 		TreeMap<Item, List<Long>> itemInstances = null;
 		for (File itemSetFile : itemSetFiles) {
-			TreeSet<Item> currentItemSet = new TreeSet<Item>();
+			ItemSet currentItemSet = new ItemSet();
 			discoveredItemSets.add(currentItemSet);
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader(itemSetFile));
@@ -145,11 +145,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				String itemSet = thingAfterColon.substring(1, thingAfterColon.length() - 1);
 				String[] items = itemSet.split(", ");
 				for (String item : items) {
-					currentItemSet.add(new LongItem(Long.parseLong(item)));
+					currentItemSet.addItem(new LongItem(Long.parseLong(item)));
 				}
 				
-				reader.readLine(); //Size
-				reader.readLine(); //Frequency 
+				currentItemSet.setSize(Integer.parseInt(getThingAfterColon(reader)));
+				currentItemSet.setFrequency(Integer.parseInt(getThingAfterColon(reader))); 
 				
 				String line;
 				itemInstances = new TreeMap<Item, List<Long>>();
@@ -179,7 +179,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			}
 		}
 
-		return new Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>>(discoveredItemSets,itemInstances);
+		return new Tuple<List<ItemSet>, Map<Item, List<Long>>>(discoveredItemSets,itemInstances);
+	}
 
 	private String getThingAfterColon(BufferedReader reader) throws IOException {
 		String line = reader.readLine();
@@ -212,9 +213,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		Set<Long> triggerTimeStamps = new HashSet<Long>();
-		Tuple<List<TreeSet<Item>>, Map<Item, List<Long>>> parseItemSets = parseItemSets(atomicTransformations,
+		Tuple<List<ItemSet>, Map<Item, List<Long>>> parseItemSets = parseItemSets(atomicTransformations,
 				triggerTimeStamps);
-		List<TreeSet<Item>> discoveredItemSets = parseItemSets.getFirst();
+		List<ItemSet> discoveredItemSets = parseItemSets.getFirst();
 		Map<Item, List<Long>> itemInstances = parseItemSets.getSecond();
 		
 		int totalTriggers = triggerTimeStamps.size();
@@ -265,7 +266,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 					Long transformationID = existingDescriptor.getID();
 
-					for (TreeSet<Item> itemSet : discoveredItemSets) {
+					for (ItemSet itemSet : discoveredItemSets) {
 						candidateTransformations = tryAndContinueATransformation(candidateTransformations,
 								transformationID);
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
@@ -327,7 +328,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	}
 
 	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
-			Long transformationID, TreeSet<Item> itemSet) {
+			Long transformationID, ItemSet itemSet) {
 		LongItem item = new LongItem(transformationID);
 		if (itemSet.contains(item)) {
 			CandidateTransformation candidateTransformation = new CandidateTransformation(itemSet, item);

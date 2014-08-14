@@ -10,10 +10,10 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public class CandidateTransformation implements Comparable<CandidateTransformation>{
 
-	private Set<Item> itemSet;
+	private ItemSet itemSet;
 	private Set<Item> discoveredItems;
 
-	public CandidateTransformation(Set<Item> itemSet, Item firstItem) {
+	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
 		this.itemSet = itemSet;
 		discoveredItems = new TreeSet<Item>();
 		discoveredItems.add(firstItem);
