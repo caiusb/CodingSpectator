@@ -25,6 +25,7 @@ public class Transaction {
 
 	private final int transactionID;
 
+	/* Map <Item, Set<InstanceID>>*/
 	private Map<Item, Set<Long>> itemInstances= new HashMap<Item, Set<Long>>();
 
 	//A temporary collection, which is used when a frequency of a particular itemset is computed.
