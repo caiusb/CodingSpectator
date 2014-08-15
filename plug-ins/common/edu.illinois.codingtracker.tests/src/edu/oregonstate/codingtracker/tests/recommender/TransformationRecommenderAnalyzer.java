@@ -133,8 +133,12 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
 		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
+		/* Map<ItemSet, List<Tuple<Timestamp,Timestamp>>> */
+		Map<ItemSet, List<Tuple<Long,Long>>> occurances = new HashMap<ItemSet, List<Tuple<Long,Long>>>();
+		
 		File[] itemSetFiles = itemSetsFolder.listFiles();
 		TreeMap<Item, List<Long>> itemInstances = null;
+		
 		for (File itemSetFile : itemSetFiles) {
 			ItemSet currentItemSet = new ItemSet();
 			discoveredItemSets.add(currentItemSet);
@@ -150,9 +154,13 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				currentItemSet.setSize(Integer.parseInt(getThingAfterColon(reader.readLine())));
 				currentItemSet.setFrequency(Integer.parseInt(getThingAfterColon(reader.readLine())));
 				
+				ArrayList<Tuple<Long, Long>> itemSetOccurances = new ArrayList<Tuple<Long, Long>>();
+				
 				String line;
 				itemInstances = new TreeMap<Item, List<Long>>();
 				while ((line = reader.readLine()) != null) {
+					long beginTimeStamp = 0;
+					long endTimeStamp = Long.MAX_VALUE;
 					String[] itemOccurances = line.split(":");
 					String middleItem = itemOccurances[itemOccurances.length / 2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
@@ -167,12 +175,23 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							if (operationTimestamp >= cutoffTimestamp)
 								triggerTimeStamps.add(operationTimestamp);
 						}
+						
 						for (String transformationKindID : transformationKindIDs) {
 							long longTransformationKindID = Long.parseLong(transformationKindID);
 							transformationsList.add(longTransformationKindID);
+							
+							OperationFilePair operationFilePair = atomicTransformations.get(transformationKindID);
+							long timestamp = operationFilePair.operation.getTime();
+							if (beginTimeStamp > timestamp)
+								beginTimeStamp = timestamp;
+							if (endTimeStamp < timestamp)
+								endTimeStamp = timestamp;
 						}
 						itemInstances.put(item, transformationsList);
+						itemSetOccurances.add(new Tuple<Long, Long>(beginTimeStamp, endTimeStamp));
 					}
+					
+					occurances.put(currentItemSet, itemSetOccurances);
 				}
 			} catch (FileNotFoundException e) {
 			} catch (IOException e) {
