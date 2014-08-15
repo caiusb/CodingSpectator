@@ -180,7 +180,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							long longTransformationKindID = Long.parseLong(transformationKindID);
 							transformationsList.add(longTransformationKindID);
 							
-							OperationFilePair operationFilePair = atomicTransformations.get(transformationKindID);
+							OperationFilePair operationFilePair = atomicTransformations.get(Long.parseLong(transformationKindID));
 							long timestamp = operationFilePair.operation.getTime();
 							if (beginTimeStamp > timestamp)
 								beginTimeStamp = timestamp;
