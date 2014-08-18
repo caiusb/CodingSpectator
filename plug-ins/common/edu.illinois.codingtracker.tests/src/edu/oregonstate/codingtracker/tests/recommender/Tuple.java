@@ -22,4 +22,13 @@ public class Tuple<X,Y> {
 	public String toString() {
 		return "(" + first + ", " + second + ")";
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Tuple))
+			return false;
+		Tuple<X,Y> other = (Tuple<X,Y>) obj;
+		return (other.getFirst() == this.getFirst()) && (other.getSecond() == this.getSecond());
+	}
+
 }
