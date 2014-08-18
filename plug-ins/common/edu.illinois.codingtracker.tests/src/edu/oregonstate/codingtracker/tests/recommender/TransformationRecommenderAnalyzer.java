@@ -188,7 +188,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 								endTimeStamp = timestamp;
 						}
 						itemInstances.put(item, transformationsList);
-						itemSetOccurances.add(new Tuple<Long, Long>(beginTimeStamp, endTimeStamp));
+						Tuple<Long, Long> tuple = new Tuple<Long, Long>(beginTimeStamp, endTimeStamp);
+						if (!itemSetOccurances.contains(tuple))
+							itemSetOccurances.add(tuple);
 					}
 					
 					occurances.put(currentItemSet, itemSetOccurances);
