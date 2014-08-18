@@ -252,34 +252,34 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		int missedNodes = 0;
 
 		for (UserOperation userOperation : userOperations) {
-			long timestamp = userOperation.getTime();
-			if (timestamp < cutoffTimestamp) {// I do not want to do anything
+			if (userOperation.getTime() < cutoffTimestamp) {// I do not want to do anything
 												// with the training data
 				replay(userOperation);
 				continue;
-			}
-			if (triggerTimeStamps.contains(timestamp)) {
-				addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
-				for (CandidateTransformation candidateTransformation : candidateTransformations) {
-					ItemSet set = candidateTransformation.getItemSet();
-					List<Tuple<Long, Long>> timestamps = occurances.get(set);
-					for (Tuple<Long, Long> interval : timestamps) {
-						if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp) {
-							stringBuffer.append("Found a true match\n");
-							break;
-						}
-					}
-					
-				}
-				triggerTimeStamps.remove(timestamp); // two operations at the
-														// same time stamp will
-														// trigger only once
-				actualTriggered++;
 			}
 			if (userOperation instanceof ASTOperation)
 				operationCache.add((ASTOperation) userOperation);
 			else {
 				for (ASTOperation operation : operationCache) {
+					long timestamp = operation.getTime();
+					if (triggerTimeStamps.contains(timestamp)) {
+						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
+						for (CandidateTransformation candidateTransformation : candidateTransformations) {
+							ItemSet set = candidateTransformation.getItemSet();
+							List<Tuple<Long, Long>> timestamps = occurances.get(set);
+							for (Tuple<Long, Long> interval : timestamps) {
+								if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp) {
+									stringBuffer.append("Found a true match\n");
+									break; // I break once I find a match. Is this correct?? Or not? And why?
+								}
+							}
+							
+						}
+						triggerTimeStamps.remove(timestamp); // two operations at the
+																// same time stamp will
+																// trigger only once
+						actualTriggered++;
+					}
 					ASTNode affectedNode = getNodeForOperation(operation);
 					if (affectedNode == null) { // can't find the affected node.
 												// Should be problematic, but
