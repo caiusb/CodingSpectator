@@ -17,4 +17,9 @@ public class Tuple<X,Y> {
 	public Y getSecond() {
 		return second;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + first + ", " + second + ")";
+	}
 }
