@@ -1,6 +1,7 @@
 package edu.oregonstate.codingtracker.tests.recommender;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,6 +12,8 @@ public class ItemSet implements Iterable<Item> {
 	private Set<Item> items = null;
 	private int size;
 	private int frequency;
+	
+	private List<Tuple<Long, Long>> occurances;
 
 	public ItemSet() {
 		items = new TreeSet<Item>();
@@ -33,6 +36,10 @@ public class ItemSet implements Iterable<Item> {
 	public void setFrequency(int frequency) {
 		this.frequency = frequency;
 	}
+	
+	public void setOccurances(List<Tuple<Long, Long>> occurances) {
+		this.occurances = occurances;
+	}
 
 	public Iterator<Item> iterator() {
 		return items.iterator();
@@ -48,6 +55,10 @@ public class ItemSet implements Iterable<Item> {
 
 	public int frequency() {
 		return frequency;
+	}
+	
+	public List<Tuple<Long, Long>> getOccurances() {
+		return occurances;
 	}
 	
 	@Override

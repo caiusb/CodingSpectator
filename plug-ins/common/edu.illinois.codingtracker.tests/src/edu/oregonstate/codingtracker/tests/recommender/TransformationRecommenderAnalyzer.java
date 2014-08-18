@@ -129,13 +129,10 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
-	private Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long,Long>>>> parseItemSets(
-			Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
+	private List<ItemSet> parseItemSets(Map<Long, OperationFilePair> atomicTransformations, 
+			Set<Long> triggerTimeStamps) {
 		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
-		/* Map<ItemSet, List<Tuple<Timestamp,Timestamp>>> */
-		Map<ItemSet, List<Tuple<Long,Long>>> occurances = new HashMap<ItemSet, List<Tuple<Long,Long>>>();
-		
 		File[] itemSetFiles = itemSetsFolder.listFiles();
 		TreeMap<Item, List<Long>> itemInstances = null;
 		
@@ -199,14 +196,14 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							itemSetOccurances.add(tuple);
 					}
 					
-					occurances.put(currentItemSet, itemSetOccurances);
+					currentItemSet.setOccurances(itemSetOccurances);
 				}
 			} catch (FileNotFoundException e) {
 			} catch (IOException e) {
 			}
 		}
 
-		return new Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long,Long>>>>(discoveredItemSets, occurances);
+		return discoveredItemSets;
 	}
 
 	private String getThingAfterColon(String line) {
@@ -239,10 +236,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		Set<Long> triggerTimeStamps = new HashSet<Long>();
-		Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long, Long>>>> parseItemSets = parseItemSets(atomicTransformations,
+		List<ItemSet> itemSets = parseItemSets(atomicTransformations,
 				triggerTimeStamps);
-		List<ItemSet> discoveredItemSets = parseItemSets.getFirst();
-		Map<ItemSet, List<Tuple<Long, Long>>> occurances = parseItemSets.getSecond();
 		
 		int totalTriggers = triggerTimeStamps.size();
 		int actualTriggered = 0;
@@ -274,7 +269,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 						for (CandidateTransformation candidateTransformation : candidateTransformations) {
 							ItemSet set = candidateTransformation.getItemSet();
-							List<Tuple<Long, Long>> timestamps = occurances.get(set);
+							List<Tuple<Long, Long>> timestamps = set.getOccurances();
 							for (Tuple<Long, Long> interval : timestamps) {
 								if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp) {
 									stringBuffer.append("Found a true match\n");
@@ -308,7 +303,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 					Long transformationID = existingDescriptor.getID();
 
-					for (ItemSet itemSet : discoveredItemSets) {
+					for (ItemSet itemSet : itemSets) {
 						candidateTransformations = tryAndContinueATransformation(candidateTransformations,
 								transformationID);
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
