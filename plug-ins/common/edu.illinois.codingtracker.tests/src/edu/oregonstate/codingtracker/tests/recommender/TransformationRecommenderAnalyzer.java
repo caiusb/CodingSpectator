@@ -182,9 +182,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							
 							OperationFilePair operationFilePair = atomicTransformations.get(Long.parseLong(transformationKindID));
 							long timestamp = operationFilePair.operation.getTime();
-							if (beginTimeStamp > timestamp)
+							if (beginTimeStamp < timestamp)
 								beginTimeStamp = timestamp;
-							if (endTimeStamp < timestamp)
+							if (endTimeStamp > timestamp)
 								endTimeStamp = timestamp;
 						}
 						itemInstances.put(item, transformationsList);
@@ -198,7 +198,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			}
 		}
 
-		return new Tuple<List<ItemSet>, Map<Item, List<Long>>>(discoveredItemSets, itemInstances);
+		return new Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long,Long>>>>(discoveredItemSets, occurances);
 	}
 
 	private String getThingAfterColon(String line) {
