@@ -260,6 +260,15 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			}
 			if (triggerTimeStamps.contains(timestamp)) {
 				addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
+				for (CandidateTransformation candidateTransformation : candidateTransformations) {
+					ItemSet set = candidateTransformation.getItemSet();
+					List<Tuple<Long, Long>> timestamps = occurances.get(set);
+					for (Tuple<Long, Long> interval : timestamps) {
+						if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp)
+							stringBuffer.append("Found a true match\n");
+					}
+					
+				}
 				triggerTimeStamps.remove(timestamp); // two operations at the
 														// same time stamp will
 														// trigger only once
