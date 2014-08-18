@@ -86,4 +86,8 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 			return 0;
 		return 1;
 	}
+
+	public ItemSet getItemSet() {
+		return itemSet;
+	}
 }
