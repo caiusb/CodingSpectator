@@ -49,6 +49,11 @@ public class ItemSet implements Iterable<Item> {
 	public int frequency() {
 		return frequency;
 	}
+	
+	@Override
+	public int hashCode() {
+		return items.hashCode();
+	}
 
 	@Override
 	public String toString() {
