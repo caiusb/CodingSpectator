@@ -159,8 +159,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				String line;
 				itemInstances = new TreeMap<Item, List<Long>>();
 				while ((line = reader.readLine()) != null) {
-					long beginTimeStamp = 0;
-					long endTimeStamp = Long.MAX_VALUE;
+					long beginTimeStamp = Long.MAX_VALUE;
+					long endTimeStamp = 0;
 					String[] itemOccurances = line.split(":");
 					String middleItem = itemOccurances[itemOccurances.length / 2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
@@ -182,9 +182,9 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							
 							OperationFilePair operationFilePair = atomicTransformations.get(Long.parseLong(transformationKindID));
 							long timestamp = operationFilePair.operation.getTime();
-							if (beginTimeStamp < timestamp)
+							if (beginTimeStamp > timestamp)
 								beginTimeStamp = timestamp;
-							if (endTimeStamp > timestamp)
+							if (endTimeStamp < timestamp)
 								endTimeStamp = timestamp;
 						}
 						itemInstances.put(item, transformationsList);
@@ -264,8 +264,10 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					ItemSet set = candidateTransformation.getItemSet();
 					List<Tuple<Long, Long>> timestamps = occurances.get(set);
 					for (Tuple<Long, Long> interval : timestamps) {
-						if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp)
+						if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp) {
 							stringBuffer.append("Found a true match\n");
+							continue;
+						}
 					}
 					
 				}
