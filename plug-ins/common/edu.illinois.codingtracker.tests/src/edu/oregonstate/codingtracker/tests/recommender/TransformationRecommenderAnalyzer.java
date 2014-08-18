@@ -271,8 +271,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							ItemSet set = candidateTransformation.getItemSet();
 							List<Tuple<Long, Long>> timestamps = set.getOccurances();
 							for (Tuple<Long, Long> interval : timestamps) {
-									stringBuffer.append("Found a true match\n");
 								if (interval.getFirst() < timestamp && interval.getSecond() > timestamp) {
+									stringBuffer.append("Found a transformation at this timestamp: " + set + " \n");
 									break; // I break once I find a match. Is this correct?? Or not? And why?
 								}
 							}
