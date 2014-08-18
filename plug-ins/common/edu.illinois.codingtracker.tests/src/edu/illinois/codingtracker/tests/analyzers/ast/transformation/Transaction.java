@@ -73,8 +73,6 @@ public class Transaction {
 		boolean addedItem = false;
 		for (Item item : itemSet) {
 			for (long itemInstanceID : itemInstances.get(item)) {
-				if (removedDuplicatedInstanceIDs.contains(itemInstanceID))
-					continue; //not considering removed things. Does this really matter?
 				result.append(itemInstanceID).append(",");
 				addedItem = true;
 			}
