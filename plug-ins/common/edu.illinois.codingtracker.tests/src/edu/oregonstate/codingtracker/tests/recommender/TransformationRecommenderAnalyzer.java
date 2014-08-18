@@ -129,7 +129,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return new CellProcessor[] { new ParseLong(), new ParseLong(), new ParseLong(), null };
 	}
 
-	private Tuple<List<ItemSet>, Map<Item, List<Long>>> parseItemSets(
+	private Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long,Long>>>> parseItemSets(
 			Map<Long, OperationFilePair> atomicTransformations, Set<Long> triggerTimeStamps) {
 		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
@@ -231,11 +231,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
 		Set<Long> triggerTimeStamps = new HashSet<Long>();
-		Tuple<List<ItemSet>, Map<Item, List<Long>>> parseItemSets = parseItemSets(atomicTransformations,
+		Tuple<List<ItemSet>, Map<ItemSet, List<Tuple<Long, Long>>>> parseItemSets = parseItemSets(atomicTransformations,
 				triggerTimeStamps);
 		List<ItemSet> discoveredItemSets = parseItemSets.getFirst();
-		Map<Item, List<Long>> itemInstances = parseItemSets.getSecond();
-
+		Map<ItemSet, List<Tuple<Long, Long>>> occurances = parseItemSets.getSecond();
+		
 		int totalTriggers = triggerTimeStamps.size();
 		int actualTriggered = 0;
 
