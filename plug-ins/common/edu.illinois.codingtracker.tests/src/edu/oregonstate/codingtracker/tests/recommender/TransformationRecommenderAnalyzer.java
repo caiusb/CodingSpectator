@@ -162,11 +162,15 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					long beginTimeStamp = Long.MAX_VALUE;
 					long endTimeStamp = 0;
 					String[] itemOccurances = line.split(":");
+					if (itemOccurances.length == 0)
+						continue;
 					String middleItem = itemOccurances[itemOccurances.length / 2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
 					for (String itemOccurance : itemOccurances) {
 						Item item = itemSetIterator.next();
 						String[] transformationKindIDs = itemOccurance.split(",");
+						if (transformationKindIDs.length == 0)
+							continue;
 						ArrayList<Long> transformationsList = new ArrayList<Long>();
 						if (middleItem == itemOccurance) {
 							OperationFilePair operationFilePair = atomicTransformations.get(Long
@@ -177,6 +181,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						}
 						
 						for (String transformationKindID : transformationKindIDs) {
+							if (transformationKindID.equals(""))
+								continue;
 							long longTransformationKindID = Long.parseLong(transformationKindID);
 							transformationsList.add(longTransformationKindID);
 							
