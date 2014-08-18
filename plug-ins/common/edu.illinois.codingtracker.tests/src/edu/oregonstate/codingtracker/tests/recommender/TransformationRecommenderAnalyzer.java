@@ -266,7 +266,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					for (Tuple<Long, Long> interval : timestamps) {
 						if (interval.getFirst() <= timestamp && interval.getSecond() >= timestamp) {
 							stringBuffer.append("Found a true match\n");
-							continue;
+							break;
 						}
 					}
 					
