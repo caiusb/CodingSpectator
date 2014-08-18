@@ -70,13 +70,16 @@ public class Transaction {
 
 	public StringBuffer getItemSetInstancesAsText(TreeSet<Item> itemSet) {
 		StringBuffer result= new StringBuffer();
+		boolean addedItem = false;
 		for (Item item : itemSet) {
 			for (long itemInstanceID : itemInstances.get(item)) {
 				if (removedDuplicatedInstanceIDs.contains(itemInstanceID))
 					continue; //not considering removed things. Does this really matter?
 				result.append(itemInstanceID).append(",");
+				addedItem = true;
 			}
-			result.delete(result.length()-1, result.length()); 
+			if (addedItem)
+				result.delete(result.length()-1, result.length()); 
 			result.append(":");
 		}
 		result.delete(result.length()-1, result.length());
