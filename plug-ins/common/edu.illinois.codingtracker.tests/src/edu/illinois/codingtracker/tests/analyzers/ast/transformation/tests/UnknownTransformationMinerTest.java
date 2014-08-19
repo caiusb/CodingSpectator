@@ -243,5 +243,13 @@ public class UnknownTransformationMinerTest {
 		assertEquals(0, getFrequency("acdefg"));
 		assertEquals(8, getFrequency("abceg"));
 	}
+	
+	@Test
+	public void testNonContigous() {
+		mine("abxcdabycdabzcd",5);
+		assertEquals(3, getFrequency("abcd"));
+		assertEquals(0, getFrequency("ab")); // subsumed
+		assertEquals(0, getFrequency("cd")); // subsumed
+	}
 
 }
