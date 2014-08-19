@@ -248,8 +248,8 @@ public class UnknownTransformationMinerTest {
 	public void testNonContigous() {
 		mine("abxcdabycdabzcd",5);
 		assertEquals(3, getFrequency("abcd"));
-		assertEquals(0, getFrequency("ab")); // subsumed
-		assertEquals(0, getFrequency("cd")); // subsumed
+		assertEquals(0, getFrequency("ab")); // subsumed because it's not a closed itemset
+		assertEquals(0, getFrequency("cd")); // subsumed because it's not a closed itemset
 	}
 
 }
