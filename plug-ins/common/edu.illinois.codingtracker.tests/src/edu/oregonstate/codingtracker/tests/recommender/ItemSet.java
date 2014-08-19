@@ -13,7 +13,7 @@ public class ItemSet implements Iterable<Item> {
 	private int size;
 	private int frequency;
 	
-	private List<Tuple<Long, Long>> occurances;
+	private List<ExistingTransformation> occurances;
 
 	public ItemSet() {
 		items = new TreeSet<Item>();
@@ -37,7 +37,7 @@ public class ItemSet implements Iterable<Item> {
 		this.frequency = frequency;
 	}
 	
-	public void setOccurances(List<Tuple<Long, Long>> occurances) {
+	public void setOccurances(List<ExistingTransformation> occurances) {
 		this.occurances = occurances;
 	}
 
@@ -57,7 +57,7 @@ public class ItemSet implements Iterable<Item> {
 		return frequency;
 	}
 	
-	public List<Tuple<Long, Long>> getOccurances() {
+	public List<ExistingTransformation> getOccurances() {
 		return occurances;
 	}
 	

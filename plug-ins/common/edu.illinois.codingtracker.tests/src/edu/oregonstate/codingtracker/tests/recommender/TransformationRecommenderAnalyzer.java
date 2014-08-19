@@ -151,7 +151,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				currentItemSet.setSize(Integer.parseInt(getThingAfterColon(reader.readLine())));
 				currentItemSet.setFrequency(Integer.parseInt(getThingAfterColon(reader.readLine())));
 				
-				ArrayList<Tuple<Long, Long>> itemSetOccurances = new ArrayList<Tuple<Long, Long>>();
+				ArrayList<ExistingTransformation> itemSetOccurances = new ArrayList<ExistingTransformation>();
 				
 				String line;
 				itemInstances = new TreeMap<Item, List<Long>>();
@@ -191,7 +191,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 								endTimeStamp = timestamp;
 						}
 						itemInstances.put(item, transformationsList);
-						Tuple<Long, Long> tuple = new Tuple<Long, Long>(beginTimeStamp, endTimeStamp);
+						ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet);
 						if (!itemSetOccurances.contains(tuple))
 							itemSetOccurances.add(tuple);
 					}
@@ -266,18 +266,22 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				for (ASTOperation operation : operationCache) {
 					long timestamp = operation.getTime();
 					if (triggerTimeStamps.contains(timestamp)) {
-						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
+						List<ExistingTransformation> existingTransformations = new ArrayList<ExistingTransformation>();
 						for (CandidateTransformation candidateTransformation : candidateTransformations) {
 							ItemSet set = candidateTransformation.getItemSet();
-							List<Tuple<Long, Long>> timestamps = set.getOccurances();
-							for (Tuple<Long, Long> interval : timestamps) {
-								if (interval.getFirst() < timestamp && interval.getSecond() > timestamp) {
-									stringBuffer.append("Found a transformation at this timestamp: " + set + " \n");
+							List<ExistingTransformation> timestamps = set.getOccurances();
+							for (ExistingTransformation existingTransformation : timestamps) {
+								if (existingTransformation.containsTimestamp(timestamp)) {
+									existingTransformations.add(existingTransformation);
 									break; // I break once I find a match. Is this correct?? Or not? And why?
 								}
 							}
-							
 						}
+						Collections.sort(existingTransformations);
+						for (ExistingTransformation existingTransformation : existingTransformations) {
+							stringBuffer.append("Existing " + existingTransformation + "\n");
+						}
+						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 						triggerTimeStamps.remove(timestamp); // two operations at the
 																// same time stamp will
 																// trigger only once
