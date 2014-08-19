@@ -134,7 +134,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
 		File[] itemSetFiles = itemSetsFolder.listFiles();
-		TreeMap<Item, List<Long>> itemInstances = null;
 		
 		for (File itemSetFile : itemSetFiles) {
 			ItemSet currentItemSet = new ItemSet();
@@ -154,7 +153,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 				ArrayList<ExistingTransformation> itemSetOccurances = new ArrayList<ExistingTransformation>();
 				
 				String line;
-				itemInstances = new TreeMap<Item, List<Long>>();
 				while ((line = reader.readLine()) != null) {
 					long beginTimeStamp = Long.MAX_VALUE;
 					long endTimeStamp = 0;
@@ -190,7 +188,6 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							if (endTimeStamp < timestamp)
 								endTimeStamp = timestamp;
 						}
-						itemInstances.put(item, transformationsList);
 						ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet);
 						if (!itemSetOccurances.contains(tuple))
 							itemSetOccurances.add(tuple);
