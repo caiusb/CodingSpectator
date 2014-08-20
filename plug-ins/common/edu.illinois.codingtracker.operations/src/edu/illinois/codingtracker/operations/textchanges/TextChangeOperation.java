@@ -137,9 +137,9 @@ public abstract class TextChangeOperation extends UserOperation {
 			//This is not executed while postprocessing to avoid USER Objects leak.
 			currentViewer.setSelectedRange(offset, length);
 		}
-		if (!replacedText.equals(currentDocument.get(offset, length))) {
-			throw new RuntimeException("Replaced text is not present in the document: " + this);
-		}
+		//if (!replacedText.equals(currentDocument.get(offset, length))) {
+			//throw new RuntimeException("Replaced text is not present in the document: " + this);
+		//}
 	}
 
 	private void postReplay() throws BadLocationException {
