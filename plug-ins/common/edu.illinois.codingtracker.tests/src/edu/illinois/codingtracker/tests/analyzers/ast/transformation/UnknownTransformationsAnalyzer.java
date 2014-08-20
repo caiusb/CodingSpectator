@@ -141,7 +141,8 @@ public class UnknownTransformationsAnalyzer extends CSVProducingAnalyzer {
 		if (!(operation instanceof InferredUnknownTransformationOperation)) {
 			return false;
 		}
-		return !ignoredAtomicTransformations.contains(((InferredUnknownTransformationOperation)operation).getDescriptor());
+		boolean returnValue = ignoredAtomicTransformations.contains(((InferredUnknownTransformationOperation)operation).getDescriptor());
+		return !returnValue;
 	}
 
 	@Override
