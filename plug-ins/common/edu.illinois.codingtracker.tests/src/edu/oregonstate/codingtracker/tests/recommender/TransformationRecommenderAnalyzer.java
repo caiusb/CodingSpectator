@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -163,6 +164,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					String middleItem = itemOccurances[itemOccurances.length / 2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
 					List<Long> itemOccurancesInAnInstance = new ArrayList<Long>();
+					Tuple<Tuple<String,OperationKind>, Long> usableMiddleItem = null;
 					for (String itemOccurance : itemOccurances) {
 						Item item = itemSetIterator.next();
 						String[] transformationKindIDs = itemOccurance.split(",");
@@ -176,7 +178,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 								UnknownTransformationDescriptor descriptor = transformationKinds.get(((LongItem)item).getValue());
 								String nodeType = descriptor.getAffectedNodeType();
 								OperationKind operationKind = descriptor.getOperationKind();
-								triggerTimeStamps.add(new Tuple<Tuple<String,OperationKind>,Long>(new Tuple<String,OperationKind>(nodeType,operationKind),operationTimestamp));
+								usableMiddleItem = new Tuple<Tuple<String,OperationKind>,Long>(new Tuple<String,OperationKind>(nodeType,operationKind),operationTimestamp);
+								triggerTimeStamps.add(usableMiddleItem);
 							}
 						}
 						
@@ -198,7 +201,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						itemOccurancesInAnInstance.addAll(transformationsList);
 					}
 					
-					ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet, itemOccurancesInAnInstance);
+					ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet, itemOccurancesInAnInstance, usableMiddleItem);
 					if (!itemSetOccurances.contains(tuple))
 						itemSetOccurances.add(tuple);
 					currentItemSet.setOccurances(itemSetOccurances);
@@ -283,15 +286,21 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							ItemSet set = candidateTransformation.getItemSet();
 							List<ExistingTransformation> timestamps = set.getOccurances();
 							for (ExistingTransformation existingTransformation : timestamps) {
-								if (existingTransformation.containsTimestamp(timestamp)) {
+								if (existingTransformation.containsMiddleItem(currentOperation)) {
 									existingTransformations.add(existingTransformation);
 									break; // I break once I find a match. Is this correct?? Or not? And why?
 								}
 							}
 						}
 						Collections.sort(existingTransformations);
+						Collections.sort(candidateTransformations, Collections.reverseOrder());
 						for (ExistingTransformation existingTransformation : existingTransformations) {
-							stringBuffer.append("Existing " + existingTransformation + "\n");
+							stringBuffer.append("E:" + existingTransformation);
+							for(int i=0; i<candidateTransformations.size(); i++)
+								if (candidateTransformations.get(i).getItemSet().equals(existingTransformation.getItemSet()))
+									stringBuffer.append(" P:" + (i + 1) + "/" + candidateTransformations.size());
+							stringBuffer.append("\n");
+										
 						}
 						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 						triggerTimeStamps.remove(timestamp); // two operations at the
@@ -368,7 +377,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private void addCandidatesToStringBuffer(List<CandidateTransformation> candidateTransformations,
 			StringBuffer stringBuffer) {
 		Collections.sort(candidateTransformations, Collections.reverseOrder());
-		stringBuffer.append(candidateTransformations.size() + "\n");
+		stringBuffer.append("************\n");
 		for (CandidateTransformation candidateTransformation : candidateTransformations) {
 			stringBuffer.append("C:");
 			stringBuffer.append(candidateTransformation + "\n");
