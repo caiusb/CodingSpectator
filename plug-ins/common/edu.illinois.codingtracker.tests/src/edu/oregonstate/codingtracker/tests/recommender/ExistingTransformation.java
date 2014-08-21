@@ -1,15 +1,19 @@
 package edu.oregonstate.codingtracker.tests.recommender;
 
+import java.util.List;
+
 public class ExistingTransformation implements Comparable<ExistingTransformation> {
 
 	private long startTime;
 	private long endTime;
 	private ItemSet itemSet;
+	private List<Long> transformationIDs;
 
-	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet) {
+	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet, List<Long> itemOccurancesInAnInstance) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.itemSet = itemSet;
+		this.transformationIDs = itemOccurancesInAnInstance;
 	}
 	
 	public boolean containsTimestamp(long timestamp) {
@@ -47,5 +51,13 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 	@Override
 	public String toString() {
 		return "(" + startTime + "," + endTime + "): " + itemSet;
+	}
+
+	public List<Long> getTransformationIDs() {
+		return transformationIDs;
+	}
+
+	public long getStartTime() {
+		return startTime;
 	}
 }	

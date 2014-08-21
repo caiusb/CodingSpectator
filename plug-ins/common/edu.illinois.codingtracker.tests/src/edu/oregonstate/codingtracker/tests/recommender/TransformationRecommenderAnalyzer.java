@@ -332,6 +332,24 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		return userOperations;
 	}
 
+	private List<Tuple<Long, Long>> getTriggerTimeStamps(long cutoffTimestamp, Map<Long, OperationFilePair> atomicTransformations,
+			List<ExistingTransformation> allExistingTransformationOccurances) {
+		List<Tuple<Long,Long>> triggers = new ArrayList<Tuple<Long, Long>>();
+		for (ExistingTransformation transformation : allExistingTransformationOccurances) {
+			List<Long> transformationIDs = transformation.getTransformationIDs();
+			Long middleTransformationID = transformationIDs.get(transformationIDs.size() / 2);
+			InferredUnknownTransformationOperation middleOperation = atomicTransformations.get(middleTransformationID).operation;
+			long middleOperationTimestamp = middleOperation.getTime();
+			if (middleOperationTimestamp < cutoffTimestamp)
+				continue;
+			long middleTransformationKindID = middleOperation.getTransformationKindID();
+			triggers.add(new Tuple<Long, Long>(middleOperationTimestamp, middleTransformationKindID));
+		}
+		
+		return triggers;
+		
+	}
+
 	private void addCandidatesToStringBuffer(List<CandidateTransformation> candidateTransformations,
 			StringBuffer stringBuffer) {
 		Collections.sort(candidateTransformations, Collections.reverseOrder());
