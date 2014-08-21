@@ -30,5 +30,11 @@ public class Tuple<X,Y> {
 		Tuple<X,Y> other = (Tuple<X,Y>) obj;
 		return (other.getFirst().equals(this.getFirst())) && (other.getSecond().equals(this.getSecond()));
 	}
+	
+	@Override
+	public int hashCode() {
+		int prime = 31;
+		return 31 ^ first.hashCode() ^ second.hashCode();
+	}
 
 }
