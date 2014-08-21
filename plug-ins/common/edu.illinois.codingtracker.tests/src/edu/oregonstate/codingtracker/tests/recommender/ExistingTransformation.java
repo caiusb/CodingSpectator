@@ -2,22 +2,30 @@ package edu.oregonstate.codingtracker.tests.recommender;
 
 import java.util.List;
 
+import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.OperationKind;
+
 public class ExistingTransformation implements Comparable<ExistingTransformation> {
 
 	private long startTime;
 	private long endTime;
 	private ItemSet itemSet;
 	private List<Long> transformationIDs;
+	private Tuple<Tuple<String,OperationKind>,Long> middleOperation;
 
-	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet, List<Long> itemOccurancesInAnInstance) {
+	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet, List<Long> itemOccurancesInAnInstance, Tuple<Tuple<String,OperationKind>,Long> middleOperation) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.itemSet = itemSet;
 		this.transformationIDs = itemOccurancesInAnInstance;
+		this.middleOperation = middleOperation;
 	}
 	
 	public boolean containsTimestamp(long timestamp) {
 		return (startTime < timestamp) && (endTime > timestamp);
+	}
+	
+	public boolean containsMiddleItem(Tuple<Tuple<String, OperationKind>,Long> item) {
+		return item.equals(middleOperation);
 	}
 
 	/**
@@ -59,5 +67,9 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 
 	public long getStartTime() {
 		return startTime;
+	}
+
+	public ItemSet getItemSet() {
+		return itemSet;
 	}
 }	
