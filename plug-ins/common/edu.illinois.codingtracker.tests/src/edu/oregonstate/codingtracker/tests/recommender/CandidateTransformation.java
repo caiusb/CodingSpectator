@@ -9,14 +9,19 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public class CandidateTransformation implements Comparable<CandidateTransformation>{
+	
+	public static final int MAX_AGE = 5;
 
 	private ItemSet itemSet;
 	private Set<Item> discoveredItems;
+	private int age;
+	private Item lastInvalidNodeSeen = null;
 
 	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
 		this.itemSet = itemSet;
 		discoveredItems = new TreeSet<Item>();
 		discoveredItems.add(firstItem);
+		age = 0;
 	}
 
 	public boolean continuesCandidate(Item item) {
@@ -24,6 +29,11 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 			return true;
 		if (itemSet.contains(item))
 			return true;
+		if (age < MAX_AGE) {
+			if (!item.equals(lastInvalidNodeSeen))
+				age++;
+			return true;
+		}
 
 		return false;
 	}
@@ -33,7 +43,8 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 	}
 	
 	public float getRanking() {
-		return getCompleteness() * itemSet.size() * itemSet.frequency();
+		return getCompleteness() * (float) itemSet.frequency();
+//		return getCompleteness();
 	}
 
 	public void addItem(Item item) {
