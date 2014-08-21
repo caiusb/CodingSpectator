@@ -28,7 +28,7 @@ public class Tuple<X,Y> {
 		if (!(obj instanceof Tuple))
 			return false;
 		Tuple<X,Y> other = (Tuple<X,Y>) obj;
-		return (other.getFirst() == this.getFirst()) && (other.getSecond() == this.getSecond());
+		return (other.getFirst().equals(this.getFirst())) && (other.getSecond().equals(this.getSecond()));
 	}
 
 }
