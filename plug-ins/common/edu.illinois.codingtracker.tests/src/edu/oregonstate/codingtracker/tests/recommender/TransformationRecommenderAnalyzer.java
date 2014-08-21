@@ -130,7 +130,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	}
 
 	private List<ItemSet> parseItemSets(Map<Long, OperationFilePair> atomicTransformations, 
-			Set<Long> triggerTimeStamps) {
+			Map<Long, UnknownTransformationDescriptor> transformationKinds, 
+			Set<Tuple<Tuple<String, OperationKind>,Long>> triggerTimeStamps) {
 		List<ItemSet> discoveredItemSets = new ArrayList<ItemSet>();
 
 		File[] itemSetFiles = itemSetsFolder.listFiles();
@@ -161,21 +162,27 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						continue;
 					String middleItem = itemOccurances[itemOccurances.length / 2];
 					Iterator<Item> itemSetIterator = currentItemSet.iterator();
+					List<Long> itemOccurancesInAnInstance = new ArrayList<Long>();
 					for (String itemOccurance : itemOccurances) {
 						Item item = itemSetIterator.next();
 						String[] transformationKindIDs = itemOccurance.split(",");
 						if (transformationKindIDs.length == 0)
 							continue;
-						ArrayList<Long> transformationsList = new ArrayList<Long>();
 						if (middleItem == itemOccurance) {
 							OperationFilePair operationFilePair = atomicTransformations.get(Long
 									.parseLong(transformationKindIDs[0]));
 							long operationTimestamp = operationFilePair.operation.getTime();
-							if (operationTimestamp >= cutoffTimestamp)
-								triggerTimeStamps.add(operationTimestamp);
+							if (operationTimestamp >= cutoffTimestamp) {
+								UnknownTransformationDescriptor descriptor = transformationKinds.get(((LongItem)item).getValue());
+								String nodeType = descriptor.getAffectedNodeType();
+								OperationKind operationKind = descriptor.getOperationKind();
+								triggerTimeStamps.add(new Tuple<Tuple<String,OperationKind>,Long>(new Tuple<String,OperationKind>(nodeType,operationKind),operationTimestamp));
+							}
 						}
 						
+						List<Long> transformationsList = Collections.emptyList();
 						for (String transformationKindID : transformationKindIDs) {
+							transformationsList = new ArrayList<Long>();
 							if (transformationKindID.equals(""))
 								continue;
 							long longTransformationKindID = Long.parseLong(transformationKindID);
@@ -188,11 +195,12 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							if (endTimeStamp < timestamp)
 								endTimeStamp = timestamp;
 						}
-						ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet);
-						if (!itemSetOccurances.contains(tuple))
-							itemSetOccurances.add(tuple);
+						itemOccurancesInAnInstance.addAll(transformationsList);
 					}
 					
+					ExistingTransformation tuple = new ExistingTransformation(beginTimeStamp, endTimeStamp, currentItemSet, itemOccurancesInAnInstance);
+					if (!itemSetOccurances.contains(tuple))
+						itemSetOccurances.add(tuple);
 					currentItemSet.setOccurances(itemSetOccurances);
 				}
 			} catch (FileNotFoundException e) {
@@ -232,9 +240,8 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 		Map<Long, UnknownTransformationDescriptor> transformationKinds = parseTransformationKindsFile();
 		/* Map<Timestamp,OperationFilePair> */
 		Map<Long, OperationFilePair> atomicTransformations = parseAtomicTransformationsFile(transformationKinds);
-		Set<Long> triggerTimeStamps = new HashSet<Long>();
-		List<ItemSet> itemSets = parseItemSets(atomicTransformations,
-				triggerTimeStamps);
+		Set<Tuple<Tuple<String,OperationKind>, Long>> triggerTimeStamps = new HashSet<Tuple<Tuple<String,OperationKind>, Long>>();
+		List<ItemSet> itemSets = parseItemSets(atomicTransformations, transformationKinds, triggerTimeStamps);
 		
 		int totalTriggers = triggerTimeStamps.size();
 		int actualTriggered = 0;
@@ -244,7 +251,12 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			Long hash = hash(descriptor);
 			astMappedTransformationKinds.put(hash, descriptor);
 		}
-
+		
+		List<ExistingTransformation> allExistingTransformationOccurances = new ArrayList<ExistingTransformation>();
+		for (ItemSet itemSet : itemSets) {
+			allExistingTransformationOccurances.addAll(itemSet.getOccurances());
+		}
+		
 		List<CandidateTransformation> candidateTransformations = new ArrayList<CandidateTransformation>();
 
 		List<ASTOperation> operationCache = new ArrayList<ASTOperation>();
@@ -262,7 +274,10 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			else {
 				for (ASTOperation operation : operationCache) {
 					long timestamp = operation.getTime();
-					if (triggerTimeStamps.contains(timestamp)) {
+					String nodeType = operation.getAffectedNodeDescriptor().getNodeType();
+					OperationKind operationKind = operation.getOperationKind();
+					Tuple<Tuple<String, OperationKind>, Long> currentOperation = new Tuple<Tuple<String,OperationKind>, Long>(new Tuple<String,OperationKind>(nodeType, operationKind), timestamp);
+					if (triggerTimeStamps.contains(currentOperation)) {
 						List<ExistingTransformation> existingTransformations = new ArrayList<ExistingTransformation>();
 						for (CandidateTransformation candidateTransformation : candidateTransformations) {
 							ItemSet set = candidateTransformation.getItemSet();
