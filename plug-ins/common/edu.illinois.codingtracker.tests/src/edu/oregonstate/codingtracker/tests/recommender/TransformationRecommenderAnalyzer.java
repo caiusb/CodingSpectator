@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,8 @@ import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -46,6 +50,7 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.Ope
 import edu.illinois.codingtracker.tests.postprocessors.ast.ASTPostprocessor;
 import edu.illinois.codingtracker.tests.postprocessors.ast.transformation.UnknownTransformationDescriptorFactory;
 
+@RunWith(Parameterized.class)
 public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 	private final File transformationKindsFile = new File(Configuration.TRAINING_DATA_FOLDER,
@@ -57,8 +62,19 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER, Configuration.ITEM_SETS_FOLDER);
 
 	private StringBuffer stringBuffer = new StringBuffer();
+	private StringBuffer resultsBuffer = new StringBuffer();
 
 	private long cutoffTimestamp = 1407102349988l;
+	
+	public TransformationRecommenderAnalyzer(int maxForeignItems) {
+		
+	}
+	
+	private static Collection<Integer> maxItems() {
+		return Arrays.asList(new Integer[] {
+				0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+		});
+	}
 
 	/**
 	 * I parse the transformationKinds.csv file and return a new, populated map.
