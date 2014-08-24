@@ -10,8 +10,8 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public class CandidateTransformation implements Comparable<CandidateTransformation>{
 	
-	public static final int MAX_AGE = 5;
-
+	public static final int MAX_FOREIGN_ITEMS = 5;
+	
 	private ItemSet itemSet;
 	private Set<Item> discoveredItems;
 	private int age;
@@ -29,7 +29,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 			return true;
 		if (itemSet.contains(item))
 			return true;
-		if (age < MAX_AGE) {
+		if (age < MAX_FOREIGN_ITEMS) {
 			if (!item.equals(lastInvalidNodeSeen))
 				age++;
 			return true;
