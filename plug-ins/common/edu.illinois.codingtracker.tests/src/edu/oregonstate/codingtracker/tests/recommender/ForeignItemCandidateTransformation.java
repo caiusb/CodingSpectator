@@ -34,10 +34,9 @@ public class ForeignItemCandidateTransformation extends CandidateTransformation 
 
 	@Override 
 	public boolean continuesCandidate(Item item) {
-		if (discoveredItems.contains(item))
+		if (super.continuesCandidate(item) == true)
 			return true;
-		if (itemSet.contains(item))
-			return true;
+		
 		if (foreignItems < maxForeignItems) {
 			if (!item.equals(lastInvalidNodeSeen))
 				foreignItems++;
