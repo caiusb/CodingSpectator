@@ -368,7 +368,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 					for (ItemSet itemSet : itemSets) {
 						candidateTransformations = tryAndContinueATransformation(candidateTransformations,
 								transformationID, timestamp);
-						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
+						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet, timestamp);
 					}
 
 					float maxCompleteness = 0;
@@ -446,10 +446,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	}
 
 	private void tryAndCreateANewTransformation(List<CandidateTransformation> candidateTransformations,
-			Long transformationID, ItemSet itemSet) {
+			Long transformationID, ItemSet itemSet, long timestamp) {
 		LongItem item = new LongItem(transformationID);
 		if (itemSet.contains(item)) {
-			CandidateTransformation candidateTransformation = new ForeignItemCandidateTransformation(itemSet, item, maxForeignItems);
+			//CandidateTransformation candidateTransformation = new ForeignItemCandidateTransformation(itemSet, item, maxForeignItems);
+			CandidateTransformation candidateTransformation = new AgeCandidateTransformation(itemSet, item, timestamp, maxForeignItems);
 			if (candidateTransformations.contains(candidateTransformation))
 				return;
 			candidateTransformations.add(candidateTransformation);
