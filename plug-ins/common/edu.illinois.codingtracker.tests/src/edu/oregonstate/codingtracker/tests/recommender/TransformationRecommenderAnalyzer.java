@@ -65,14 +65,27 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private StringBuffer resultsBuffer = new StringBuffer();
 
 	private long cutoffTimestamp = 1407102349988l;
+
+	private final int maxForeignItems;
 	
-	public TransformationRecommenderAnalyzer(int maxForeignItems) {
-		
+	public TransformationRecommenderAnalyzer(int maxForeignItems, int somethingElse) {
+		this.maxForeignItems = maxForeignItems;
 	}
 	
-	private static Collection<Integer> maxItems() {
-		return Arrays.asList(new Integer[] {
-				0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+	@Parameters
+	public static Collection<Integer[]> maxItems() {
+		return Arrays.asList(new Integer[][] {
+				{0, 0}, 
+				{1, 0},
+				{2, 0},
+				{3, 0},
+				{4, 0},
+				{5, 0},
+				{6, 0},
+				{7, 0},
+				{8, 0}, 
+				{9, 0},
+				{10, 0}
 		});
 	}
 
