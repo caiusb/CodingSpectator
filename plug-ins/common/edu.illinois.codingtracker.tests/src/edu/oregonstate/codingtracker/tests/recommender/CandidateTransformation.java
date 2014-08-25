@@ -2,56 +2,28 @@ package edu.oregonstate.codingtracker.tests.recommender;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
-public class CandidateTransformation implements Comparable<CandidateTransformation>{
-	
-	public static final int DEFAULT_MAX_FOREIGN_ITEMS = 5;
-	
-	private ItemSet itemSet;
-	private Set<Item> discoveredItems;
-	private int foreignItems;
-	private Item lastInvalidNodeSeen = null;
-	private int maxForeignItems;
-	
-	public CandidateTransformation(ItemSet itemSet, Item firstItem, int maxForeignItems) {
-		this.itemSet = itemSet;
-		discoveredItems = new TreeSet<Item>();
-		discoveredItems.add(firstItem);
-		foreignItems = 0;
-		this.maxForeignItems = maxForeignItems;
-	}
+public abstract class CandidateTransformation implements Comparable<CandidateTransformation> {
 
-	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
-		this(itemSet, firstItem, DEFAULT_MAX_FOREIGN_ITEMS);
-	}
+	protected ItemSet itemSet;
+	protected Set<Item> discoveredItems;
 
-	public boolean continuesCandidate(Item item) {
-		if (discoveredItems.contains(item))
-			return true;
-		if (itemSet.contains(item))
-			return true;
-		if (foreignItems < maxForeignItems) {
-			if (!item.equals(lastInvalidNodeSeen))
-				foreignItems++;
-			return true;
-		}
-
-		return false;
+	public CandidateTransformation() {
+		super();
 	}
 
 	public float getCompleteness() {
 		return ((float) discoveredItems.size()) / itemSet.size();
 	}
-	
+
 	public float getRanking() {
-		return getCompleteness() * (float) itemSet.frequency();
-//		return getCompleteness();
-	}
+			return getCompleteness() * (float) itemSet.frequency();
+	//		return getCompleteness();
+		}
 
 	public void addItem(Item item) {
 		if (!discoveredItems.contains(item))
@@ -62,7 +34,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 	public String toString() {
 		return getRanking() + " " + discoveredItems + "/" + itemSet; 
 	}
-	
+
 	public String getTransformationInHumanTerms(Map<Long, UnknownTransformationDescriptor> transformationKinds) {
 		String result = "[";
 		for (Item item : itemSet) {
@@ -79,7 +51,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 		return result;
 		
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof CandidateTransformation))
@@ -87,13 +59,12 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 		
 		return ((CandidateTransformation)o).itemSet.equals(itemSet);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return itemSet.hashCode();
 	}
 
-	@Override
 	public int compareTo(CandidateTransformation o) {
 		float ranking1 = getRanking();
 		float ranking2 = o.getRanking();
@@ -107,4 +78,7 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 	public ItemSet getItemSet() {
 		return itemSet;
 	}
+
+	public abstract boolean continuesCandidate(Item longItem);
+
 }

@@ -449,7 +449,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			Long transformationID, ItemSet itemSet) {
 		LongItem item = new LongItem(transformationID);
 		if (itemSet.contains(item)) {
-			CandidateTransformation candidateTransformation = new CandidateTransformation(itemSet, item, maxForeignItems);
+			CandidateTransformation candidateTransformation = new ForeignItemCandidateTransformation(itemSet, item, maxForeignItems);
 			if (candidateTransformations.contains(candidateTransformation))
 				return;
 			candidateTransformations.add(candidateTransformation);
