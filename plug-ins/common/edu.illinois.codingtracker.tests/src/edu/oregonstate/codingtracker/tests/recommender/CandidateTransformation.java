@@ -10,18 +10,24 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public class CandidateTransformation implements Comparable<CandidateTransformation>{
 	
-	public static final int MAX_FOREIGN_ITEMS = 5;
+	public static final int DEFAULT_MAX_FOREIGN_ITEMS = 5;
 	
 	private ItemSet itemSet;
 	private Set<Item> discoveredItems;
-	private int age;
+	private int foreignItems;
 	private Item lastInvalidNodeSeen = null;
-
-	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
+	private int maxForeignItems;
+	
+	public CandidateTransformation(ItemSet itemSet, Item firstItem, int maxForeignItems) {
 		this.itemSet = itemSet;
 		discoveredItems = new TreeSet<Item>();
 		discoveredItems.add(firstItem);
-		age = 0;
+		foreignItems = 0;
+		this.maxForeignItems = maxForeignItems;
+	}
+
+	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
+		this(itemSet, firstItem, DEFAULT_MAX_FOREIGN_ITEMS);
 	}
 
 	public boolean continuesCandidate(Item item) {
@@ -29,9 +35,9 @@ public class CandidateTransformation implements Comparable<CandidateTransformati
 			return true;
 		if (itemSet.contains(item))
 			return true;
-		if (age < MAX_FOREIGN_ITEMS) {
+		if (foreignItems < maxForeignItems) {
 			if (!item.equals(lastInvalidNodeSeen))
-				age++;
+				foreignItems++;
 			return true;
 		}
 
