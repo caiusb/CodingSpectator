@@ -20,8 +20,11 @@ public class AgeCandidateTransformation extends CandidateTransformation {
 
 	@Override
 	public boolean continuesCandidate(ItemOccurance itemOccurance) {
-		if(super.continuesCandidate(itemOccurance))
+		if (super.continuesCandidate(itemOccurance))
 			return true;
+		
+		if (maxTime == 0)
+			return false;
 		
 		long time = itemOccurance.getTime();
 		
