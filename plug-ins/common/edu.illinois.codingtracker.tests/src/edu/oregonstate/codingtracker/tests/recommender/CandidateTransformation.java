@@ -2,6 +2,7 @@ package edu.oregonstate.codingtracker.tests.recommender;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import edu.illinois.codingtracker.operations.ast.UnknownTransformationDescriptor;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.Item;
@@ -9,11 +10,13 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 
 public abstract class CandidateTransformation implements Comparable<CandidateTransformation> {
 
-	protected ItemSet itemSet;
-	protected Set<Item> discoveredItems;
+	private ItemSet itemSet;
+	private Set<Item> discoveredItems;
 
-	public CandidateTransformation() {
-		super();
+	public CandidateTransformation(ItemSet itemSet, Item firstItem) {
+		this.itemSet = itemSet;
+		discoveredItems = new TreeSet<Item>();
+		discoveredItems.add(firstItem);
 	}
 
 	public float getCompleteness() {
