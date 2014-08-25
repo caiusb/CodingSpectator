@@ -367,7 +367,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 					for (ItemSet itemSet : itemSets) {
 						candidateTransformations = tryAndContinueATransformation(candidateTransformations,
-								transformationID);
+								transformationID, timestamp);
 						tryAndCreateANewTransformation(candidateTransformations, transformationID, itemSet);
 					}
 
@@ -457,10 +457,10 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	}
 
 	private List<CandidateTransformation> tryAndContinueATransformation(
-			List<CandidateTransformation> candidateTransformations, Long transformationID) {
+			List<CandidateTransformation> candidateTransformations, Long transformationID, long time) {
 		ArrayList<CandidateTransformation> remainingTransformations = new ArrayList<CandidateTransformation>();
 		for (CandidateTransformation transformation : candidateTransformations) {
-			if (transformation.continuesCandidate(new LongItem(transformationID))) {
+			if (transformation.continuesCandidate(new ItemOccurance(new LongItem(transformationID), time))) {
 				transformation.addItem(new LongItem(transformationID));
 				remainingTransformations.add(transformation);
 			}

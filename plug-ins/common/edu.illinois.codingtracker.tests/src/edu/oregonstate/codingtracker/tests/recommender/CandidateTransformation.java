@@ -82,7 +82,8 @@ public abstract class CandidateTransformation implements Comparable<CandidateTra
 		return itemSet;
 	}
 
-	public boolean continuesCandidate(Item item) {
+	public boolean continuesCandidate(ItemOccurance itemOccurance) {
+		Item item = itemOccurance.getItem();
 		if (discoveredItems.contains(item))
 			return true;
 		if (itemSet.contains(item))
