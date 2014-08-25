@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -31,6 +30,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.supercsv.cellprocessor.ParseLong;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvListReader;
@@ -62,11 +62,15 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 	private final File itemSetsFolder = new File(Configuration.TRAINING_DATA_FOLDER, Configuration.ITEM_SETS_FOLDER);
 
 	private StringBuffer stringBuffer = new StringBuffer();
-	private StringBuffer resultsBuffer = new StringBuffer();
+	private static StringBuffer resultsBuffer;
 
 	private long cutoffTimestamp = 1407102349988l;
 
 	private final int maxForeignItems;
+	
+	static {
+		resultsBuffer = new StringBuffer();
+	}
 	
 	public TransformationRecommenderAnalyzer(int maxForeignItems, int somethingElse) {
 		this.maxForeignItems = maxForeignItems;
@@ -323,14 +327,18 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 						}
 						Collections.sort(existingTransformations);
 						Collections.sort(candidateTransformations, Collections.reverseOrder());
+						int combinedRanking = 0;
 						for (ExistingTransformation existingTransformation : existingTransformations) {
 							stringBuffer.append("E:" + existingTransformation);
 							for(int i=0; i<candidateTransformations.size(); i++)
-								if (candidateTransformations.get(i).getItemSet().equals(existingTransformation.getItemSet()))
+								if (candidateTransformations.get(i).getItemSet().equals(existingTransformation.getItemSet())) {
 									stringBuffer.append(" P:" + (i + 1) + "/" + candidateTransformations.size());
+									combinedRanking += (i+1);
+								}
 							stringBuffer.append("\n");
-										
 						}
+						resultsBuffer.append(combinedRanking + "/" + candidateTransformations.size() + "\t");
+
 						addCandidatesToStringBuffer(candidateTransformations, stringBuffer);
 						triggerTimeStamps.remove(timestamp); // two operations at the
 																// same time stamp will
@@ -372,7 +380,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 							mostCompletedTransformation = transformation;
 						}
 					}
-
+					
 				}
 				operationCache = new ArrayList<ASTOperation>();
 
@@ -382,6 +390,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 		System.out.println("In total, I missed " + missedNodes + " nodes :(");
 		System.out.println("Triggered " + actualTriggered + " out of " + totalTriggers + " possible");
+		resultsBuffer.append("\n");
 		return userOperations;
 	}
 
@@ -440,7 +449,7 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 			Long transformationID, ItemSet itemSet) {
 		LongItem item = new LongItem(transformationID);
 		if (itemSet.contains(item)) {
-			CandidateTransformation candidateTransformation = new CandidateTransformation(itemSet, item);
+			CandidateTransformation candidateTransformation = new CandidateTransformation(itemSet, item, maxForeignItems);
 			if (candidateTransformations.contains(candidateTransformation))
 				return;
 			candidateTransformations.add(candidateTransformation);
@@ -477,11 +486,11 @@ public class TransformationRecommenderAnalyzer extends ASTPostprocessor {
 
 	@Override
 	protected String getResultFilePostfix() {
-		return ".recommender";
+		return ".recommender.foreign";
 	}
 
 	@Override
 	protected String getResult() {
-		return stringBuffer.toString();
+		return resultsBuffer.toString();
 	}
 }
