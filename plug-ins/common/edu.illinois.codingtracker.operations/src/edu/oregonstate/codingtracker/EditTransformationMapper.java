@@ -8,7 +8,7 @@ public class EditTransformationMapper {
 	
 	private static EditTransformationMapper instance = null;
 	
-	private List<TextChangeOperation> unmachedOperations; 
+	private List<UpdatableTextChangeOperation> unmachedOperations; 
 
 	public static EditTransformationMapper getInstance() {
 		if (instance == null)
@@ -17,8 +17,8 @@ public class EditTransformationMapper {
 	}
 
 	public void processTextChange(TextChangeOperation textChangeOperation) {
-		for (TextChangeOperation operation : unmachedOperations) {
-			
+		for (UpdatableTextChangeOperation operation : unmachedOperations) {
+			operation.updateInRegardTo(textChangeOperation);
 		}
 	}
 
