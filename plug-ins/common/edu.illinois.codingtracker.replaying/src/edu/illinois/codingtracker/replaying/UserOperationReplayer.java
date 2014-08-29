@@ -147,11 +147,11 @@ public class UserOperationReplayer {
 						showMessage("There are no operations near timestamp " + searchedTimestamp);
 					} else {
 						long deltaTime= Math.abs(searchedTimestamp - foundUserOperation.getTime());
-						if (deltaTime == 0) {
-							showMessage("Found the exact match!");
-						} else {
-							showMessage("Found the closest operation, delta = " + deltaTime + " ms.");
-						}
+//						if (deltaTime == 0) {
+//							showMessage("Found the exact match!");
+//						} else {
+//							showMessage("Found the closest operation, delta = " + deltaTime + " ms.");
+//						}
 						operationSequenceView.setSelection(new StructuredSelection(foundUserOperation));
 						if (!operationSequenceView.getOperationSequenceFilter().isShown(foundUserOperation)) {
 							showMessage("Operation with timestamp " + foundUserOperation.getTime() + " is filtered out");
