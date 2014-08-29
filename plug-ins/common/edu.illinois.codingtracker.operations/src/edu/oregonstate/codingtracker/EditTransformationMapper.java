@@ -22,9 +22,21 @@ public class EditTransformationMapper {
 	}
 
 	public void processTextChange(TextChangeOperation textChangeOperation) {
-		for (UpdatableTextChangeOperation operation : unmachedOperations) {
+		ArrayList<UpdatableTextChangeOperation> copyOfUnmachedOperations = makeCopyOfUnmachedOperations();
+		for (UpdatableTextChangeOperation operation : copyOfUnmachedOperations) {
 			operation.updateInRegardTo(textChangeOperation);
 		}
+		unmachedOperations.add(new UpdatableTextChangeOperation(textChangeOperation));
+	}
 	}
 
+	private ArrayList<UpdatableTextChangeOperation> makeCopyOfUnmachedOperations() {
+		ArrayList<UpdatableTextChangeOperation> copyOfUnmachedOperations = new ArrayList<UpdatableTextChangeOperation>();
+		copyOfUnmachedOperations.addAll(unmachedOperations);
+		return copyOfUnmachedOperations;
+	}
+	
+	public int getNumberOFUnmachedTrasformations() {
+		return unmachedOperations.size();
+	}
 }
