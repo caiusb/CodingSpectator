@@ -15,7 +15,8 @@ Export-Package: edu.illinois.codingtracker.operations,
  edu.illinois.codingtracker.operations.references,
  edu.illinois.codingtracker.operations.resources,
  edu.illinois.codingtracker.operations.starts,
- edu.illinois.codingtracker.operations.textchanges
+ edu.illinois.codingtracker.operations.textchanges,
+ edu.oregonstate.codingtracker
 Require-Bundle: edu.illinois.codingtracker.compare.helpers;visibility:=reexport,
  edu.illinois.codingtracker.helpers;visibility:=reexport,
  org.eclipse.jdt.core,
