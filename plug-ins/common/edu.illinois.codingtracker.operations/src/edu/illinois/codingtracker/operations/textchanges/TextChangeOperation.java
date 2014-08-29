@@ -14,6 +14,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.text.undo.DocumentUndoManagerRegistry;
 import org.eclipse.text.undo.IDocumentUndoManager;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import edu.illinois.codingtracker.compare.helpers.EditorHelper;
 import edu.illinois.codingtracker.helpers.Configuration;
