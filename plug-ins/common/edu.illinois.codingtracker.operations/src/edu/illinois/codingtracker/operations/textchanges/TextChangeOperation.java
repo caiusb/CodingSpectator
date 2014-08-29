@@ -50,6 +50,8 @@ public abstract class TextChangeOperation extends UserOperation {
 
 	private boolean isRecordedWhileRefactoring= false;
 
+	private long transformationID = -1l;
+
 
 	public TextChangeOperation() {
 		super();
@@ -97,6 +99,7 @@ public abstract class TextChangeOperation extends UserOperation {
 		textChunk.append(newText);
 		textChunk.append(offset);
 		textChunk.append(length);
+		textChunk.append(transformationID);
 	}
 
 	@Override
@@ -105,6 +108,7 @@ public abstract class TextChangeOperation extends UserOperation {
 		newText= operationLexer.readString();
 		offset= operationLexer.readInt();
 		length= operationLexer.readInt();
+//		transformationID = operationLexer.readLong();
 	}
 
 	@Override
@@ -160,6 +164,11 @@ public abstract class TextChangeOperation extends UserOperation {
 				replaySpecificTextChange();
 			} else {
 				currentDocument.replace(offset, length, newText);
+				EditTransformationMapper.getInstance().processTextChange(this);
+//				if (currentEditor instanceof ITextEditor) {
+//					((ITextEditor)currentEditor).setHighlightRange(offset, length, true);
+//					((ITextEditor)currentEditor).showHighlightRangeOnly(true);
+//				}
 			}
 		}
 	}
@@ -307,5 +316,13 @@ public abstract class TextChangeOperation extends UserOperation {
 	}
 
 	protected abstract void replaySpecificTextChange() throws BadLocationException, ExecutionException;
+
+	public void addToTransformation(long transformationID) {
+		this.transformationID = transformationID;
+	}
+	
+	public long getTransformationID() {
+		return transformationID;
+	}
 
 }
