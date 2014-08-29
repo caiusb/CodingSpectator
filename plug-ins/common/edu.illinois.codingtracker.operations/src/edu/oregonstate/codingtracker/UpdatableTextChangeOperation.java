@@ -11,7 +11,7 @@ public class UpdatableTextChangeOperation {
 	
 	public UpdatableTextChangeOperation(TextChangeOperation operation) {
 		this.operation = operation;
-		this.actualLength = operation.getLength();
+		this.actualLength = operation.getNewText().length();
 		this.actualOffset = operation.getOffset();
 	}
 
