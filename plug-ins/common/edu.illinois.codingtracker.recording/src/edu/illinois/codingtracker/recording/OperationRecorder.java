@@ -79,8 +79,7 @@ public class OperationRecorder {
 	private static final ASTOperationRecorder astRecorder= ASTOperationRecorder.getInstance();
 
 	private IFile lastEditedFile= null;
-
-
+	
 	public static OperationRecorder getInstance() {
 		if (recorderInstance == null) {
 			recorderInstance= new OperationRecorder();
@@ -90,7 +89,7 @@ public class OperationRecorder {
 
 	private OperationRecorder() {
 	}
-
+	
 	public void recordRefreshedFile(IFile refreshedFile, String replacedText) {
 		boolean isFileKnown= knownFilesRecorder.isFileKnown(refreshedFile, true);
 		if (!isFileKnown) {
