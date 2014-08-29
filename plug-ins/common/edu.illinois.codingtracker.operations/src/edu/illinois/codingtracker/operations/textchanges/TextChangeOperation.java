@@ -21,6 +21,7 @@ import edu.illinois.codingtracker.helpers.ResourceHelper;
 import edu.illinois.codingtracker.operations.OperationLexer;
 import edu.illinois.codingtracker.operations.OperationTextChunk;
 import edu.illinois.codingtracker.operations.UserOperation;
+import edu.oregonstate.codingtracker.EditTransformationMapper;
 
 /**
  * 
