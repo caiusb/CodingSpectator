@@ -11,6 +11,12 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 	private ItemSet itemSet;
 	private List<Long> transformationIDs;
 	private Tuple<Tuple<String,OperationKind>,Long> middleOperation;
+	private int number;
+	
+	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet, List<Long> itemOccurancesInAnInstance, Tuple<Tuple<String,OperationKind>,Long> middleOperation, int number) {
+		this(startTime, endTime, itemSet, itemOccurancesInAnInstance, middleOperation);
+		this.number = number;
+	}
 
 	public ExistingTransformation(long startTime, long endTime, ItemSet itemSet, List<Long> itemOccurancesInAnInstance, Tuple<Tuple<String,OperationKind>,Long> middleOperation) {
 		this.startTime = startTime;
@@ -58,7 +64,7 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 	
 	@Override
 	public String toString() {
-		return "(" + startTime + "," + endTime + "): " + itemSet;
+		return number + ": (" + startTime + "," + endTime + "): " + itemSet;
 	}
 
 	public List<Long> getTransformationIDs() {
@@ -71,5 +77,9 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 
 	public ItemSet getItemSet() {
 		return itemSet;
+	}
+	
+	private int getNumber() {
+		return number;
 	}
 }	
