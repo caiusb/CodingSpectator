@@ -35,4 +35,18 @@ public class UpdatableTextChangeOperation {
 	private boolean isAfter(TextChangeOperation textChangeOperation) {
 		return textChangeOperation.getOffset() > (actualOffset + actualLength);
 	}
+
+	public boolean contains(int offset, int length) {
+		return (((offset > (actualOffset)) && (offset < (actualOffset + actualLength))) 
+				|| (((offset + length) > actualLength) && ((offset + length) < (actualOffset + actualLength))));
+	}
+	
+	public TextChangeOperation getOperation() {
+		return operation;
+	}
+	
+	@Override
+	public String toString() {
+		return operation + "\nActualOffset: " + actualOffset + "\nActtualLength: " + actualLength;
+	}
 }
