@@ -25,9 +25,12 @@ public class TextRecorder {
 	private final static ASTOperationRecorder astRecorder= ASTOperationRecorder.getInstance();
 
 	private final static SafeRecorder safeRecorder= new SafeRecorder("codingtracker/codechanges.txt");
-
+	
+	private static boolean isTurnedOff = false;
 
 	public static void record(UserOperation userOperation) {
+		if (isTurnedOff)
+			return;
 		if (!Configuration.isInReplayMode) {
 			//Before any user operation, excluding several exceptions, flush the accumulated AST changes.
 			if (!(userOperation instanceof ASTOperation) && !(userOperation instanceof TextChangeOperation) &&
@@ -44,4 +47,13 @@ public class TextRecorder {
 		return safeRecorder.mainRecordFilePath;
 	}
 
+	public static void turnOff() {
+		isTurnedOff = true;
+		safeRecorder.turnOff();
+	}
+	
+	public static void turnOn() {
+		isTurnedOff = false;
+		safeRecorder.turnOn();
+	}
 }

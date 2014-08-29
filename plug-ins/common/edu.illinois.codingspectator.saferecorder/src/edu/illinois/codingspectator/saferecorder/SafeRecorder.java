@@ -25,6 +25,8 @@ public class SafeRecorder {
 
 	public final String mainRecordFilePath;
 
+	private static boolean isTurnedOff = false;
+
 	public SafeRecorder(String relativePathToMainRecordFile) {
 		mainRecordFilePath= CodingSpectatorDataPlugin.getVersionedStorageLocation().append(relativePathToMainRecordFile).toOSString();
 		mainRecordFile= new File(mainRecordFilePath);
@@ -59,8 +61,18 @@ public class SafeRecorder {
 			}
 		}
 	}
+	
+	public void turnOff() {
+		isTurnedOff = true;
+	}
+	
+	public void turnOn() {
+		isTurnedOff = false;
+	}
 
 	public synchronized void record(CharSequence text) {
+		if (isTurnedOff)
+			return;
 		try {
 			ResourceHelper.ensureFileExists(currentRecordFile);
 		} catch (IOException e) {
