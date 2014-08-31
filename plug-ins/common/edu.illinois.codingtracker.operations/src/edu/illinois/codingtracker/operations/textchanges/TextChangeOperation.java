@@ -323,8 +323,9 @@ public abstract class TextChangeOperation extends UserOperation {
 		this.transformationID = transformationID;
 	}
 	
-	public long getTransformationID() {
-		return transformationID;
+	@Override
+	public String getTransformationIDString() {
+		return "" + transformationID;
 	}
 
 }
