@@ -42,7 +42,7 @@ public class TransformationMapperAnalysis extends MiningResultsAnalyzer {
 		for (UserOperation userOperation : userOperations) {
 			record(userOperation);
 			if (userOperation instanceof TextChangeOperation)
-				System.out.println(((TextChangeOperation)userOperation).getTransformationID());
+				System.out.println(((TextChangeOperation)userOperation).getTransformationIDString());
 		}
 		
 		System.out.println("# of unmached transformations: " + EditTransformationMapper.getInstance().getNumberOFUnmachedTrasformations() + 

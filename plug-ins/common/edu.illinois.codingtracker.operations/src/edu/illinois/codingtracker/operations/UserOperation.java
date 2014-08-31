@@ -92,5 +92,9 @@ public abstract class UserOperation {
 	protected abstract void initializeFrom(OperationLexer operationLexer);
 
 	public abstract void replay() throws Exception;
+	
+	public String getTransformationIDString() {
+		return "";
+	}
 
 }
