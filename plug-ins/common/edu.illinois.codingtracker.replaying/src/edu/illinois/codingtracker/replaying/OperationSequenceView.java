@@ -4,6 +4,9 @@
 package edu.illinois.codingtracker.replaying;
 
 
+import java.awt.Button;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -66,8 +69,7 @@ public class OperationSequenceView extends ViewPart {
 	private Text operationTextPane;
 
 	private boolean shouldScrollToCurrentOperation= true;
-
-
+	
 	public OperationSequenceView() {
 		operationSequenceFilter= new OperationSequenceFilter(this);
 		userOperationReplayer= new UserOperationReplayer(this);
@@ -132,6 +134,14 @@ public class OperationSequenceView extends ViewPart {
 				updateCellAppearance(cell);
 			}
 		});
+		TableViewerColumn transformationColumn= createColumn("Transformation ID", 90);
+		transformationColumn.setLabelProvider(new StyledCellLabelProvider() {
+			@Override
+			public void update(ViewerCell cell) {
+				cell.setText(String.valueOf(((UserOperation)cell.getElement()).getTransformationIDString()));
+				updateCellAppearance(cell);
+			}
+		});
 	}
 
 	private void updateCellAppearance(ViewerCell cell) {
@@ -185,7 +195,7 @@ public class OperationSequenceView extends ViewPart {
 		gridData.grabExcessVerticalSpace= true;
 		tableViewer.getControl().setLayoutData(gridData);
 	}
-
+	
 	private void addViewerListeners() {
 		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
