@@ -79,7 +79,7 @@ public class ExistingTransformation implements Comparable<ExistingTransformation
 		return itemSet;
 	}
 	
-	private int getNumber() {
+	public int getNumber() {
 		return number;
 	}
 }	
