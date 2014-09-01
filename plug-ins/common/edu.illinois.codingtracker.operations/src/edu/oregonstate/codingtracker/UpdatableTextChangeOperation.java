@@ -2,6 +2,12 @@ package edu.oregonstate.codingtracker;
 
 import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
 
+/**
+ * I am a wrapper around a TextChangeOperation. This allows
+ * me to change my offset, so I always point to the right
+ * place in the source code file.
+ * 
+ */
 public class UpdatableTextChangeOperation {
 
 	private TextChangeOperation operation;
