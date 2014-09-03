@@ -179,7 +179,8 @@ public class UserOperationReplayer {
 						}
 						if (userOperation instanceof InferredUnknownTransformationOperation) {
 							InferredUnknownTransformationOperation transformation= (InferredUnknownTransformationOperation)userOperation;
-							boolean isPatternTransformation= transformationIDs.remove(transformation.getTransformationID());
+							long transformationID = transformation.getTransformationID();
+							boolean isPatternTransformation= transformationIDs.remove(transformationID);
 							if (isPatternTransformation) {
 								patternOperations.add(transformation);
 							}
