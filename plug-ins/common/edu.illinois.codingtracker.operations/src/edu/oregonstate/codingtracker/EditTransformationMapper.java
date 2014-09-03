@@ -50,7 +50,7 @@ public class EditTransformationMapper {
 		return copyOfUnmachedOperations;
 	}
 	
-	public int getNumberOFUnmachedTrasformations() {
 		return unmachedOperations.size();
+	public int getNumberOfUnmachedTrasformations() {
 	}
 }
