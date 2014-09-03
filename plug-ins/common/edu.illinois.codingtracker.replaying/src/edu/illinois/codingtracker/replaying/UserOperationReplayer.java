@@ -139,9 +139,9 @@ public class UserOperationReplayer {
 		findAction= new Action() {
 			@Override
 			public void run() {
-				TimestampDialog dialog= new TimestampDialog(operationSequenceView.getShell(), "Find operation");
+				LongInputDialog dialog= new LongInputDialog(operationSequenceView.getShell(), "Find operation", "Provide timestamp:");
 				if (dialog.open() == Window.OK) {
-					long searchedTimestamp= dialog.getTimestamp();
+					long searchedTimestamp= dialog.getInput();
 					UserOperation foundUserOperation= findUserOperationClosestToTimestamp(searchedTimestamp);
 					if (foundUserOperation == null) {
 						showMessage("There are no operations near timestamp " + searchedTimestamp);
@@ -333,9 +333,9 @@ public class UserOperationReplayer {
 
 			@Override
 			public void run() {
-				TimestampDialog dialog= new TimestampDialog(operationSequenceView.getShell(), "Jump to timestamp");
+				LongInputDialog dialog= new LongInputDialog(operationSequenceView.getShell(), "Jump to timestamp", "Provide timestamp:");
 				if (dialog.open() == Window.OK) {
-					jumpToTimestamp= dialog.getTimestamp();
+					jumpToTimestamp= dialog.getInput();
 					while (true) {
 						initializeAction();
 						for (UserOperation userOperation : userOperations) {

@@ -18,21 +18,23 @@ import org.eclipse.swt.widgets.Text;
  * @author Stas Negara
  * 
  */
-public class TimestampDialog extends Dialog {
+public class LongInputDialog extends Dialog {
 
-	private static long timestamp= 0;
+	private static long input= 0;
 
 	private final String message;
 
 	private Text text;
 
-	protected TimestampDialog(Shell parentShell, String message) {
+	private String prompt;
+
+	protected LongInputDialog(Shell parentShell, String message, String prompt) {
 		super(parentShell);
 		this.message= message;
 	}
 
-	public long getTimestamp() {
-		return timestamp;
+	public long getInput() {
+		return input;
 	}
 
 	@Override
@@ -49,10 +51,10 @@ public class TimestampDialog extends Dialog {
 		composite.setLayout(layout);
 		Label label= new Label(composite, SWT.NONE);
 		label.setLayoutData(new GridData(140, 15));
-		label.setText("Provide timestamp:");
+		label.setText(prompt);
 		text= new Text(composite, SWT.BORDER);
 		text.setLayoutData(new GridData(85, 15));
-		text.setText(String.valueOf(timestamp));
+		text.setText(String.valueOf(input));
 		return composite;
 
 	}
@@ -60,9 +62,9 @@ public class TimestampDialog extends Dialog {
 	@Override
 	protected void okPressed() {
 		try {
-			timestamp= Long.valueOf(text.getText().trim());
+			input= Long.valueOf(text.getText().trim());
 		} catch (NumberFormatException ex) {
-			timestamp= 0;
+			input= 0;
 		}
 		super.okPressed();
 	}
