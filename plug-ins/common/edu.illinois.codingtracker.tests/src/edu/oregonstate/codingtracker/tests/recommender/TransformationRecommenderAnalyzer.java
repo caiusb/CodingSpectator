@@ -21,6 +21,7 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.UnknownTransformationsAnalyzer;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
 import edu.oregonstate.codingtracker.EditTransformationMapper;
+import edu.oregonstate.codingtracker.helpers.Tuple;
 
 @RunWith(Parameterized.class)
 public class TransformationRecommenderAnalyzer extends MiningResultsAnalyzer {

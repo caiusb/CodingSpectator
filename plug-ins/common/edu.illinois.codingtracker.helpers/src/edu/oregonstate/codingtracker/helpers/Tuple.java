@@ -1,4 +1,4 @@
-package edu.oregonstate.codingtracker.tests.recommender;
+package edu.oregonstate.codingtracker.helpers;
 
 public class Tuple<X,Y> {
 

@@ -42,6 +42,7 @@ import edu.illinois.codingtracker.tests.analyzers.ast.transformation.LongItem;
 import edu.illinois.codingtracker.tests.analyzers.ast.transformation.helpers.OperationFilePair;
 import edu.illinois.codingtracker.tests.postprocessors.ast.ASTPostprocessor;
 import edu.illinois.codingtracker.tests.postprocessors.ast.transformation.UnknownTransformationDescriptorFactory;
+import edu.oregonstate.codingtracker.helpers.Tuple;
 
 public abstract class MiningResultsAnalyzer extends ASTPostprocessor {
 

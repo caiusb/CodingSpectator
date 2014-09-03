@@ -3,6 +3,7 @@ package edu.oregonstate.codingtracker.tests.recommender;
 import java.util.List;
 
 import edu.illinois.codingtracker.operations.ast.ASTOperationDescriptor.OperationKind;
+import edu.oregonstate.codingtracker.helpers.Tuple;
 
 public class ExistingTransformation implements Comparable<ExistingTransformation> {
 

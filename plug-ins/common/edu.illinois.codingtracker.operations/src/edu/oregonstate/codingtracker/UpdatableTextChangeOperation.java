@@ -1,6 +1,7 @@
 package edu.oregonstate.codingtracker;
 
 import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
+import edu.oregonstate.codingtracker.helpers.Tuple;
 
 /**
  * I am a wrapper around a TextChangeOperation. This allows
