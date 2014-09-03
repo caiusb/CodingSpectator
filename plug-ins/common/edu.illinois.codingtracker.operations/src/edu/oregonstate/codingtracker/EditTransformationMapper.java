@@ -11,10 +11,10 @@ public class EditTransformationMapper {
 	
 	private static EditTransformationMapper instance = null;
 	
-	private List<UpdatableTextChangeOperation> unmachedOperations;
+	private List<UpdatableTextChangeOperation> operations;
 	
 	private EditTransformationMapper() {
-		unmachedOperations = new ArrayList<UpdatableTextChangeOperation>();
+		operations = new ArrayList<UpdatableTextChangeOperation>();
 	}
 
 	public static EditTransformationMapper getInstance() {
@@ -28,7 +28,7 @@ public class EditTransformationMapper {
 		for (UpdatableTextChangeOperation operation : copyOfUnmachedOperations) {
 			operation.updateInRegardTo(textChangeOperation);
 		}
-		unmachedOperations.add(new UpdatableTextChangeOperation(textChangeOperation));
+		operations.add(new UpdatableTextChangeOperation(textChangeOperation));
 	}
 
 	public void matchEditsToAST(ASTNode node, long transformationID) {
@@ -38,7 +38,6 @@ public class EditTransformationMapper {
 		ArrayList<UpdatableTextChangeOperation> copyOfUnmachedOperations = makeCopyOfUnmachedOperations();
 		for (UpdatableTextChangeOperation operation : copyOfUnmachedOperations) {
 			if (operation.contains(offset,length)) {
-				unmachedOperations.remove(operation);
 				operation.getOperation().addToTransformation(transformationID);
 			}
 		}
@@ -46,11 +45,11 @@ public class EditTransformationMapper {
 
 	private ArrayList<UpdatableTextChangeOperation> makeCopyOfUnmachedOperations() {
 		ArrayList<UpdatableTextChangeOperation> copyOfUnmachedOperations = new ArrayList<UpdatableTextChangeOperation>();
-		copyOfUnmachedOperations.addAll(unmachedOperations);
+		copyOfUnmachedOperations.addAll(operations);
 		return copyOfUnmachedOperations;
 	}
 	
-		return unmachedOperations.size();
 	public int getNumberOfUnmachedTrasformations() {
+		return operations.size();
 	}
 }
