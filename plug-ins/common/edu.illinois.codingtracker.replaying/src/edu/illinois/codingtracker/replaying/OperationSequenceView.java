@@ -4,9 +4,6 @@
 package edu.illinois.codingtracker.replaying;
 
 
-import java.awt.Button;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
