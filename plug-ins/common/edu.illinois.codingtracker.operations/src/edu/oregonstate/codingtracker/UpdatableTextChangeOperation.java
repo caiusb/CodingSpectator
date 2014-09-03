@@ -1,5 +1,8 @@
 package edu.oregonstate.codingtracker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.illinois.codingtracker.operations.textchanges.TextChangeOperation;
 import edu.oregonstate.codingtracker.helpers.Tuple;
 
@@ -12,48 +15,70 @@ import edu.oregonstate.codingtracker.helpers.Tuple;
 public class UpdatableTextChangeOperation {
 
 	private TextChangeOperation operation;
-
-	private int actualOffset;
-	private int actualLength;
 	
+	private List<Tuple<Integer,Integer>> fragments = new ArrayList<Tuple<Integer,Integer>>();
+
 	public UpdatableTextChangeOperation(TextChangeOperation operation) {
 		this.operation = operation;
-		this.actualLength = operation.getNewText().length();
-		this.actualOffset = operation.getOffset();
+		fragments.add(new Tuple<Integer, Integer>(operation.getOffset(), operation.getNewText().length()));
+	}
+
+	protected UpdatableTextChangeOperation(int offset, int length) {
+		fragments.add(new Tuple<Integer, Integer>(offset, length));
 	}
 
 	public void updateInRegardTo(TextChangeOperation textChangeOperation) {
-		if (isAfter(textChangeOperation))
-			return;
 		
-		if (isBefore(textChangeOperation)) {
-			actualOffset += textChangeOperation.getLength();
-			return;
+		List<Tuple<Integer,Integer>> newFragments = new ArrayList<Tuple<Integer,Integer>>();
+		
+		for (Tuple<Integer, Integer> fragment : fragments) {
+			if (isAfter(textChangeOperation, fragment)) {
+				newFragments.add(fragment);
+				continue;
+			}
+			
+			if (isBefore(textChangeOperation, fragment)) {
+				newFragments.add(new Tuple<Integer,Integer>(fragment.getFirst() + textChangeOperation.getNewText().length(), fragment.getSecond()));
+				continue;
+			}
+			
+			Tuple<Integer, Integer> fragment1 = new Tuple<Integer, Integer>(fragment.getFirst(), textChangeOperation
+					.getNewText().length() + 1);
+			Tuple<Integer, Integer> fragment2 = new Tuple<Integer, Integer>(textChangeOperation.getOffset()
+					+ textChangeOperation.getNewText().length() + 1, textChangeOperation.getOffset()
+					+ textChangeOperation.getNewText().length() + fragment.getSecond());
+			
+			newFragments.add(fragment1);
+			newFragments.add(fragment2);
 		}
 		
-		// what to do if the thing actually happens in the middle? Can this be the case?
-		// I will ignore this case for now. I hope it does not bite me in the ass!
+		
+        fragments = newFragments;
 	}
 
-	private boolean isBefore(TextChangeOperation textChangeOperation) {
-		return textChangeOperation.getOffset() < actualOffset;
+	private boolean isBefore(TextChangeOperation textChangeOperation, Tuple<Integer, Integer> fragment) {
+		return textChangeOperation.getOffset() < fragment.getFirst();
 	}
 
-	private boolean isAfter(TextChangeOperation textChangeOperation) {
-		return textChangeOperation.getOffset() > (actualOffset + actualLength);
+	private boolean isAfter(TextChangeOperation textChangeOperation, Tuple<Integer, Integer> fragment) {
+		return textChangeOperation.getOffset() > (fragment.getFirst() + fragment.getSecond());
 	}
 
-	public boolean contains(int offset, int length) {
-		return (((offset > (actualOffset)) && (offset < (actualOffset + actualLength))) 
-				|| (((offset + length) > actualLength) && ((offset + length) < (actualOffset + actualLength))));
+	public boolean contains(int matchingOffset, int matchingLength) {
+		for (Tuple<Integer,Integer> fragment : fragments) {
+			Integer actualOffset = fragment.getFirst();
+			Integer actualLength = fragment.getSecond();
+			int matchingEndingIntex = matchingOffset + matchingLength;
+			int transformationEndingIndex = actualOffset + actualLength;
+			if ((matchingOffset >= actualOffset) && (matchingOffset <= transformationEndingIndex)
+					|| (matchingEndingIntex >= actualOffset) && (matchingEndingIntex <= transformationEndingIndex)
+					|| (matchingOffset <= actualOffset) && (matchingEndingIntex >= transformationEndingIndex))
+				return true;
+		}
+		return false;
 	}
 	
 	public TextChangeOperation getOperation() {
 		return operation;
-	}
-	
-	@Override
-	public String toString() {
-		return operation + "\nActualOffset: " + actualOffset + "\nActtualLength: " + actualLength;
 	}
 }
