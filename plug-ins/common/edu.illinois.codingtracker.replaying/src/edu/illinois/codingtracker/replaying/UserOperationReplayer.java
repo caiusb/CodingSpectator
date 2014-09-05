@@ -70,6 +70,8 @@ public class UserOperationReplayer {
 	private IAction findAction;
 
 	private IAction markPatternAction;
+	
+	private IAction highlightTransformationAction; 
 
 	private final Collection<IAction> replayActions= new LinkedList<IAction>();
 
@@ -93,6 +95,8 @@ public class UserOperationReplayer {
 
 	private IEditorPart currentEditor= null;
 
+	private int transformationID = 0;
+
 
 	public UserOperationReplayer(OperationSequenceView operationSequenceView) {
 		this.operationSequenceView= operationSequenceView;
@@ -115,6 +119,8 @@ public class UserOperationReplayer {
 		toolBarManager.add(createFindOperationAction());
 		toolBarManager.add(new Separator());
 		toolBarManager.add(createMarkPatternAction());
+		toolBarManager.add(new Separator());
+		toolBarManager.add(createHighlightTransformationAction());
 		toolBarManager.add(new Separator());
 	}
 
@@ -198,6 +204,20 @@ public class UserOperationReplayer {
 		};
 		ViewerHelper.initAction(markPatternAction, "MarkPattern", "Mark operations of a pattern", false, false, false);
 		return markPatternAction;
+	}
+
+	private IAction createHighlightTransformationAction() {
+		highlightTransformationAction = new Action() {
+			@Override
+			public void run() {
+				LongInputDialog transformationIDDialog = new LongInputDialog(operationSequenceView.getShell(), "Input transformation ID", "Transformation ID");
+				if (transformationIDDialog.open() == Window.OK) {
+					transformationID = (int) transformationIDDialog.getInput();
+				}
+			}
+		};
+		ViewerHelper.initAction(highlightTransformationAction, "HighlightTransformation", "Highlight the changes made by a transformation", true, false, false);
+		return highlightTransformationAction; 
 	}
 
 	private IAction createLoadOperationSequenceAction() {
@@ -487,6 +507,9 @@ public class UserOperationReplayer {
 				((TextChangeOperation)currentUserOperation).splitReplay();
 			} else {
 				isCurrentOperationSplit= false;
+				if (currentUserOperation instanceof TextChangeOperation && transformationID != 0) {
+					((TextChangeOperation)currentUserOperation).setHighlightTransformationID(transformationID);
+				}
 				currentUserOperation.replay();
 			}
 			currentEditor= EditorHelper.getActiveEditor();
