@@ -53,7 +53,7 @@ public class TransformationMapperAnalysis extends MiningResultsAnalyzer {
 	
 	@Override
 	protected String getRecordFileName() {
-		return "codechanges.txt.inferred_ast_operations";
+		return "codechanges.txt.inferred_ast_operations.with_move.with_inferred_refactorings.with_inferred_unknown_transformations";
 	}
 
 	@Override
