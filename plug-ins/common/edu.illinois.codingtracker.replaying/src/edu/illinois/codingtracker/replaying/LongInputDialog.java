@@ -31,6 +31,7 @@ public class LongInputDialog extends Dialog {
 	protected LongInputDialog(Shell parentShell, String message, String prompt) {
 		super(parentShell);
 		this.message= message;
+		this.prompt = prompt;
 	}
 
 	public long getInput() {
