@@ -3,6 +3,10 @@
  */
 package edu.illinois.codingtracker.operations.textchanges;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.compare.internal.CompareEditor;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
@@ -14,6 +18,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.text.undo.DocumentUndoManagerRegistry;
 import org.eclipse.text.undo.IDocumentUndoManager;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import edu.illinois.codingtracker.compare.helpers.EditorHelper;
 import edu.illinois.codingtracker.helpers.Configuration;
@@ -51,7 +56,9 @@ public abstract class TextChangeOperation extends UserOperation {
 
 	private boolean isRecordedWhileRefactoring= false;
 
-	private long transformationID = -1l;
+	private List<Long> transformationsIDs = new ArrayList<Long>();
+
+	private int highlightTransformationID;
 
 
 	public TextChangeOperation() {
@@ -100,7 +107,12 @@ public abstract class TextChangeOperation extends UserOperation {
 		textChunk.append(newText);
 		textChunk.append(offset);
 		textChunk.append(length);
-		textChunk.append(transformationID);
+
+		int size = transformationsIDs.size();
+		textChunk.append(size);
+		for (Long transformationID : transformationsIDs) {
+			textChunk.append(transformationID);
+		}
 	}
 
 	@Override
@@ -109,7 +121,11 @@ public abstract class TextChangeOperation extends UserOperation {
 		newText= operationLexer.readString();
 		offset= operationLexer.readInt();
 		length= operationLexer.readInt();
-//		transformationID = operationLexer.readLong();
+		
+		int size = operationLexer.readInt();
+		for (int i=0; i<size; i++) {
+			transformationsIDs.add(operationLexer.readLong());
+		}
 	}
 
 	@Override
@@ -166,10 +182,11 @@ public abstract class TextChangeOperation extends UserOperation {
 			} else {
 				currentDocument.replace(offset, length, newText);
 				EditTransformationMapper.getInstance().processTextChange(this);
-//				if (currentEditor instanceof ITextEditor) {
-//					((ITextEditor)currentEditor).setHighlightRange(offset, length, true);
-//					((ITextEditor)currentEditor).showHighlightRangeOnly(true);
-//				}
+				if (currentEditor instanceof ITextEditor && transformationsIDs.contains((long) highlightTransformationID)) {
+					ITextEditor textEditor = (ITextEditor) currentEditor;
+					textEditor.setHighlightRange(offset, length, true);
+					textEditor.showHighlightRangeOnly(true);
+				}
 			}
 		}
 	}
@@ -297,6 +314,8 @@ public abstract class TextChangeOperation extends UserOperation {
 		sb.append("New text: " + newText + "\n");
 		sb.append("Offset: " + offset + "\n");
 		sb.append("Length: " + length + "\n");
+		Collections.sort(transformationsIDs);
+		sb.append("Transformations:" + transformationsIDs + "\n");
 		sb.append(super.toString());
 		return sb.toString();
 	}
@@ -319,12 +338,22 @@ public abstract class TextChangeOperation extends UserOperation {
 	protected abstract void replaySpecificTextChange() throws BadLocationException, ExecutionException;
 
 	public void addToTransformation(long transformationID) {
-		this.transformationID = transformationID;
+		if (!transformationsIDs.contains(transformationID))
+			transformationsIDs.add(transformationID);
 	}
 	
 	@Override
 	public String getTransformationIDString() {
-		return "" + transformationID;
+		String result = "";
+		Collections.sort(transformationsIDs);
+		for (Long transformation : transformationsIDs) {
+			result += transformation + ",";
+		}	
+		return result;
+	}
+
+	public void setHighlightTransformationID(int transformationID) {
+		this.highlightTransformationID = transformationID;
 	}
 
 }
