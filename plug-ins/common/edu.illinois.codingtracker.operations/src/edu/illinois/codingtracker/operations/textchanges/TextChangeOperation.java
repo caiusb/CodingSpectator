@@ -10,6 +10,8 @@ import java.util.List;
 import org.eclipse.compare.internal.CompareEditor;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
@@ -17,6 +19,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.text.undo.DocumentUndoManagerRegistry;
 import org.eclipse.text.undo.IDocumentUndoManager;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -182,10 +187,24 @@ public abstract class TextChangeOperation extends UserOperation {
 			} else {
 				currentDocument.replace(offset, length, newText);
 				EditTransformationMapper.getInstance().processTextChange(this);
-				if (currentEditor instanceof ITextEditor && transformationsIDs.contains((long) highlightTransformationID)) {
-					ITextEditor textEditor = (ITextEditor) currentEditor;
-					textEditor.setHighlightRange(offset, length, true);
-					textEditor.showHighlightRangeOnly(true);
+				if (currentEditor instanceof IEditorPart && transformationsIDs.contains((long) highlightTransformationID)) {
+					IEditorInput editorInput = currentEditor.getEditorInput();
+					if (editorInput instanceof FileEditorInput) {
+						FileEditorInput fileEditor = (FileEditorInput) editorInput;
+						IFile file = fileEditor.getFile();
+						IMarker marker;
+						try {
+							marker = file.createMarker(IMarker.PROBLEM);
+							marker.setAttribute(IMarker.CHAR_START, offset);
+							marker.setAttribute(IMarker.CHAR_END, offset + newText.length());
+							marker.setAttribute(IMarker.TEXT, "Occurance of transformation :" + highlightTransformationID);
+							marker.setAttribute(IMarker.LOCATION, currentEditor.getTitle());
+						} catch (CoreException e) {
+							System.out.println("Problem creating marker: " + e);
+							throw new RuntimeException(e);
+						}
+					}
+
 				}
 			}
 		}
